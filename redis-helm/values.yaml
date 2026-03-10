@@ -1,0 +1,137 @@
+# Redis Configuration
+redis:
+  # Redis mode: standalone (single node) or cluster
+  mode: standalone
+  # Database number (default: 1)
+  database: 1
+  # Redis Image Configuration (for x86 architecture)
+  image: 
+    repository: redis
+    tag: "7.4"
+    pullPolicy: IfNotPresent
+
+# ARM Redis Image Configuration (for ARM architecture)
+redis_arm:
+  image:
+    repository: arm64v8/redis
+    tag: "7.4"
+    pullPolicy: IfNotPresent
+
+# Persistence Configuration
+persistence:
+  enabled: true
+  # Storage class for cluster mode
+  storageClass: "manual-sc"
+  # Requested storage size
+  size: 2Gi
+  # Note: For Docker Desktop, use /tmp path
+  hostPath: "/tmp/helm-volumes/redis"
+  # Access mode
+  accessMode: ReadWriteOnce
+
+# Service Configuration
+service:
+  type: ClusterIP
+  port: 6379
+  targetPort: 6379
+  # Redis slave port (for replication)
+  slavePort: 6379
+  # Enable headless service for StatefulSet (required for stable network identity)
+  headless: true
+  # Annotations for service
+  annotations: {}
+
+# Resource Configuration
+resources:
+  # Default resource requests and limits
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+
+# Custom resource configurations for different modes
+customResources:
+  standalone:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  cluster:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+# Node selector
+nodeSelector:
+  # For x86: kubernetes.io/arch: amd64
+  # For ARM: kubernetes.io/arch: arm64
+  kubernetes.io/arch: "amd64"
+
+tolerations: []
+affinity: {}
+
+# Security Context
+securityContext:
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod labels
+podLabels: {}
+
+# Health check configuration
+livenessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Redis configuration
+redisConfig:
+  # Maxmemory (e.g., 256mb, 1gb)
+  maxmemory: "256mb"
+  # Maxmemory policy (allkeys-lru, noeviction, etc.)
+  maxmemoryPolicy: "allkeys-lru"
+  # Append only file (yes/no)
+  appendonly: "yes"
+
+# Environment variables (additional)
+extraEnv: []
+
+# Additional volumes
+extraVolumes: []
+extraVolumeMounts: []
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "sk-agent-account"
+
+# Ingress configuration (optional)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: redis.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
