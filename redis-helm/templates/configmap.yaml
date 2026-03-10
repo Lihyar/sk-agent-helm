@@ -20,12 +20,14 @@ data:
     # Memory
     maxmemory {{ .Values.redisConfig.maxmemory }}
     maxmemory-policy {{ .Values.redisConfig.maxmemoryPolicy }}
+
+    # Working directory (must be writable)
+    dir /data
     
     # Append only file
     appendonly {{ .Values.redisConfig.appendonly }}
-    
+    appendfilename "appendonly.aof"
+
     # Logging
     logfile ""
     
-    # Databases
-    databases {{ .Values.redis.database }}

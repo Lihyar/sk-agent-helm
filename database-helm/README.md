@@ -7,7 +7,7 @@
 - ✅ 支持 MySQL (x86架构) 和 人大金仓 (ARM架构)
 - ✅ 配置通过 ConfigMap 管理
 - ✅ 密码通过 Secret 加密存储
-- ✅ 本机持久化存储支持
+- ✅ 持久化存储支持
 - ✅ 外部访问服务配置
 - ✅ 资源大小可调整
 - ✅ 健康检查配置
@@ -17,8 +17,7 @@
 
 - Kubernetes 1.20+
 - Helm 3.0+
-- 单机环境：无需 StorageClass，支持手动创建 PV+PVC
-- 多节点环境：需要 Local Path Provisioner 或其他存储类
+- 支持StorageClass存储
 
 ## 安装部署
 
