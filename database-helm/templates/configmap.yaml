@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "database.fullname" . }}-config
+  labels:
+    {{- include "database.labels" . | nindent 4 }}
+data:
+{{- if eq .Values.database.type "mysql" }}
+  mysql.cnf: |
+    [mysqld]
+    character-set-server={{ .Values.mysql.charset }}
+    collation-server={{ .Values.mysql.collation }}
+    sql-mode={{ .Values.mysql.sqlMode }}
+    innodb-buffer-pool-size={{ .Values.resources.limits.memory | quote }}
+    innodb-log-file-size=256M
+    innodb-flush-log-at-trx-commit=1
+    max-connections=200
+    connect-timeout=10
+    wait-timeout=600
+    general-log=1
+    general-log-file=/var/log/mysql/general.log
+    slow-query-log=1
+    slow-query-log-file=/var/log/mysql/slow.log
+    long-query-time=2
+{{- if .Values.database.sslEnabled }}
+    require-secure-transport=ON
+    ssl-ca=/etc/mysql/ssl/ca.pem
+    ssl-cert=/etc/mysql/ssl/server-cert.pem
+    ssl-key=/etc/mysql/ssl/server-key.pem
+{{- end }}
+  init-mysql.sql: |
+    CREATE DATABASE IF NOT EXISTS {{ .Values.database.name }};
+    CREATE USER IF NOT EXISTS '{{ .Values.database.user }}'@'%' IDENTIFIED BY '{{ .Values.database.password | default "changeme" }}';
+    GRANT ALL PRIVILEGES ON {{ .Values.database.name }}.* TO '{{ .Values.database.user }}'@'%';
+    FLUSH PRIVILEGES;
+{{- else if eq .Values.database.type "kingbase" }}
+  kingbase.conf: |
+    listen_addresses = '*'
+    port = 54321
+    max_connections = 200
+    encoding = {{ .Values.kingbase.encoding }}
+    locale = {{ .Values.kingbase.locale }}
+    shared_buffers = {{ .Values.resources.limits.memory | quote }}
+    work_mem = 16MB
+    maintenance_work_mem = 128MB
+    wal_buffers = 16MB
+    checkpoint_completion_target = 0.9
+    logging_collector = on
+    log_directory = 'pg_log'
+    log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+    log_statement = 'all'
+    log_min_duration_statement = 1000
+{{- if .Values.database.sslEnabled }}
+    ssl = on
+    ssl_cert_file = '/etc/kingbase/ssl/server.crt
+    ssl_key_file = '/etc/kingbase/ssl/server.key'
+    ssl_ca_file = '/etc/kingbase/ssl/ca.crt'
+{{- end }}
+  init-kingbase.sql: |
+    CREATE DATABASE {{ .Values.database.name }};
+    CREATE USER {{ .Values.database.user }} WITH PASSWORD '{{ .Values.database.password | default "changeme" }}';
+    GRANT ALL PRIVILEGES ON DATABASE {{ .Values.database.name }} TO {{ .Values.database.user }};
+{{- end }}
+  database-type: {{ .Values.database.type }}
+  database-name: {{ .Values.database.name }}
+  database-user: {{ .Values.database.user }}

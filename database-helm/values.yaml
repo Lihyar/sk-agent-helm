@@ -1,0 +1,149 @@
+# Database Configuration
+database:
+  # Database type: mysql or kingbase
+  type: mysql
+  
+  # Database name to create
+  name: mydatabase
+  
+  # Database user
+  user: dbuser
+
+  # Database password
+  password: MySecurePassword123
+  
+  # Enable SSL
+  sslEnabled: false
+
+# MySQL Configuration (for x86 architecture)
+mysql:
+  image: 
+    repository: mysql
+    tag: "8.0"
+    pullPolicy: IfNotPresent
+  
+  # MySQL configuration
+  charset: utf8mb4
+  collation: utf8mb4_unicode_ci
+  
+  # MySQL specific settings
+  sqlMode: "STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO"
+
+# Kingbase Configuration (for ARM architecture)
+kingbase:
+  image:
+    repository: kingbase/kingbase
+    tag: "v8.6"
+    pullPolicy: IfNotPresent
+  
+  # Kingbase specific settings
+  encoding: UTF8
+  locale: C
+
+# Persistence Configuration
+persistence:
+  enabled: true
+  storageClass: "manual-sc"
+  # Requested storage size
+  size: 2Gi
+  # Local path for local mode (hostPath)
+  # Note: For Docker Desktop, use /tmp or a path shared with the VM
+  hostPath: "/tmp/helm-volumes/database"
+  # Access mode
+  accessMode: ReadWriteOnce
+
+# Service Configuration
+service:
+  type: LoadBalancer
+  port: 3306
+  targetPort: 3306
+  # LoadBalancer IP (optional)
+  loadBalancerIP: ""
+  # Annotations for service
+  annotations: {}
+
+# Resource Configuration
+resources:
+  # Default resource requests and limits
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+
+# Custom resource configurations for different database types
+customResources:
+  mysql:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+  kingbase:
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+    limits:
+      cpu: 4000m
+      memory: 8Gi
+
+# Node selector and tolerations
+nodeSelector:
+  # For MySQL (x86): kubernetes.io/arch: amd64
+  # For Kingbase (ARM): kubernetes.io/arch: arm64
+  kubernetes.io/arch: "amd64"
+
+tolerations: []
+affinity: {}
+
+# Security Context
+securityContext:
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod labels
+podLabels: {}
+
+# Health check configuration
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Environment variables (additional)
+extraEnv: []
+
+# Additional volumes
+extraVolumes: []
+extraVolumeMounts: []
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "sk-agent-account"
+
+# Ingress configuration (optional)
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: database.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []

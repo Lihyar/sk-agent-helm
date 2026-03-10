@@ -1,0 +1,18 @@
+apiVersion: v2
+name: database
+description: A Helm chart for deploying MySQL (x86) and Kingbase (ARM) databases
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - database
+  - mysql
+  - kingbase
+  - arm
+  - x86
+home: https://github.com/your-org/database-helm
+sources:
+  - https://github.com/your-org/database-helm
+maintainers:
+  - name: Database Team
+    email: db-team@example.com
