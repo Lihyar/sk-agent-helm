@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "rabbitmq.fullname" . }}-config
+  labels:
+    {{- include "rabbitmq.labels" . | nindent 4 }}
+data:
+  rabbitmq.conf: |
+    # RabbitMQ configuration
+    loopback_users = none
+    default_vhost = /
+    default_user = {{ .Values.rabbitmq.user }}
+    default_pass = {{ .Values.rabbitmq.password }}
+    default_permissions.configure = .*
+    default_permissions.read = .*
+    default_permissions.write = .*
+    
+    # Networking
+    port = 5672
+    management.port = 15672
+    management.load_definitions = /etc/rabbitmq/definitions.json
+    
+    # Memory and disk
+    vm_memory_high_watermark.relative = {{ .Values.rabbitmqConfig.memoryHighWatermark }}
+    disk_free_limit.absolute = {{ .Values.rabbitmqConfig.diskFreeLimit }}
+    
+    # Logging
+    log.console = true
+    log.console.level = {{ .Values.rabbitmqConfig.logLevel }}
+    
+    # Clustering
+    cluster_formation.peer_discovery_backend = rabbit_peer_discovery_classic_config
+    cluster_formation.classic_config.nodes.1 = rabbit@{{ include "rabbitmq.fullname" . }}-0
+    
+    # Queue settings
+    queue_master_locator = min-masters
+    
+    # Performance
+    channel_max = 2048
+    heartbeat = 60
+  definitions.json: |
+    {
+      "rabbit_version": "3.13.0",
+      "rabbitmq_version": "3.13.0",
+      "users": [
+        {
+          "name": "{{ .Values.rabbitmq.user }}",
+          "password_hash": "{{ .Values.rabbitmq.password | printf "%s" | b64enc }}",
+          "hashing_algorithm": "rabbit_password_hashing_sha256",
+          "tags": ["administrator"]
+        }
+      ],
+      "vhosts": [
+        {
+          "name": "/"
+        }
+      ],
+      "permissions": [
+        {
+          "user": "{{ .Values.rabbitmq.user }}",
+          "vhost": "/",
+          "configure": ".*",
+          "write": ".*",
+          "read": ".*"
+        }
+      ],
+      "topic_permissions": [],
+      "parameters": [],
+      "global_parameters": [
+        {
+          "name": "cluster_name",
+          "value": "{{ include "rabbitmq.fullname" . }}"
+        }
+      ],
+      "policies": [],
+      "queues": [],
+      "exchanges": [
+        {
+          "name": "",
+          "type": "direct",
+          "durable": true,
+          "auto_delete": false,
+          "internal": false,
+          "arguments": {}
+        }
+      ],
+      "bindings": []
+    }

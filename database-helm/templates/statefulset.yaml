@@ -130,10 +130,10 @@ spec:
                 - -p
                 - "54321"
             {{- end }}
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default (30) }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds | default (10) }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default (5) }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold | default (3) }}
           readinessProbe:
             {{- if eq .Values.database.type "mysql" }}
             exec:
@@ -150,10 +150,10 @@ spec:
                 - -p
                 - "54321"
             {{- end }}
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default (10) }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds | default (5) }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default (5) }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold | default (3) }}
           resources:
             {{- if .Values.customResources }}
             {{- if eq .Values.database.type "mysql" }}
