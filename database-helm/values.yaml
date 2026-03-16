@@ -48,7 +48,7 @@ persistence:
   size: 2Gi
   # Local path for local mode (hostPath)
   # Note: For Docker Desktop, use /tmp or a path shared with the VM
-  hostPath: "/tmp/helm-volumes/database"
+  hostPath: "/Users/haiyan/Documents/SK_K8S/sk-agent-3/volumes/database"
   # Access mode
   accessMode: ReadWriteOnce
 

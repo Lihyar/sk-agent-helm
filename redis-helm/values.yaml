@@ -25,7 +25,7 @@ persistence:
   # Requested storage size
   size: 2Gi
   # Note: For Docker Desktop, use /tmp path
-  hostPath: "/tmp/helm-volumes/redis"
+  hostPath: "/Users/haiyan/Documents/SK_K8S/sk-agent-3/volumes/redis"
   # Access mode
   accessMode: ReadWriteOnce
 

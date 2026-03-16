@@ -1,0 +1,30 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: manual-sc
+provisioner: kubernetes.io/no-provisioner  # 表示不自动创建 PV
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: manual-pv
+spec:
+  storageClassName: manual-sc
+  capacity:
+    storage: 30Gi
+  accessModes: [ReadWriteOnce]
+  hostPath:
+    path: /Users/haiyan/Documents/SK_K8S/sk-agent-3/volumes
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: manual-pvc
+spec:
+  storageClassName: manual-sc
+  resources:
+    requests:
+      storage: 2Gi
+  accessModes: [ReadWriteOnce]
