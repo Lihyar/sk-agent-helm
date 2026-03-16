@@ -64,16 +64,11 @@ spec:
                   name: {{ include "rabbitmq.fullname" . }}-secret
                   key: rabbitmq-erlang-cookie
           {{- with .Values.extraEnv }}
-          {{- toYaml . | nindent 12 }}
+          {{- toYaml . | nindent 10 }}
           {{- end }}
           volumeMounts:
             - name: data
               mountPath: /var/lib/rabbitmq
-            # - name: config
-            #   mountPath: /etc/rabbitmq
-            # - name: definitions
-            #   mountPath: /etc/rabbitmq/definitions.json
-            #   subPath: definitions.json
           livenessProbe:
             tcpSocket:
               port: amqp
@@ -91,19 +86,6 @@ spec:
             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default (3) }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      # volumes:
-      #   - name: config
-      #     configMap:
-      #       name: {{ include "rabbitmq.fullname" . }}-config
-      #       items:
-      #         - key: rabbitmq.conf
-      #           path: rabbitmq.conf
-      #   - name: definitions
-      #     configMap:
-      #       name: {{ include "rabbitmq.fullname" . }}-config
-      #       items:
-      #         - key: definitions.json
-      #           path: definitions.json
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -122,10 +104,7 @@ spec:
       spec:
         accessModes:
           - {{ .Values.persistence.accessMode }}
-        storageClassName: ""
-        selector:
-          matchLabels:
-            "rabbitmq-pv": {{ include "rabbitmq.fullname" . }}-pv
+        storageClassName: {{ .Values.persistence.storageClass }}
         resources:
           requests:
             storage: {{ .Values.persistence.size }}

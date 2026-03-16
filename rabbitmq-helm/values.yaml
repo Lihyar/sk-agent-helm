@@ -6,13 +6,13 @@ rabbitmq:
   password: rabbitmq123
   # Erlang cookie (auto-generated if empty)
   erlangCookie: ""
-  # RabbitMQ Image Configuration
+  # RabbitMQ Image Configuration (for x86 architecture)
   image:
     repository: rabbitmq
     tag: "3.13-management"
     pullPolicy: IfNotPresent
 
-# ARM RabbitMQ Image Configuration
+# ARM RabbitMQ Image Configuration (for ARM architecture)
 rabbitmq_arm:
   image:
     repository: arm64v8/rabbitmq
@@ -22,6 +22,8 @@ rabbitmq_arm:
 # Persistence Configuration
 persistence:
   enabled: true
+  # Storage class
+  storageClass: "manual-sc"
   # Requested storage size
   size: 8Gi
   # Note: For Docker Desktop, use /tmp path
@@ -35,7 +37,7 @@ service:
   port: 5672
   targetPort: 5672
   managementPort: 15672
-  # Enable headless service for StatefulSet
+  # Enable headless service for StatefulSet (required for stable network identity)
   headless: false
   # Annotations for service
   annotations: {}
