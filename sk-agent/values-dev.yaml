@@ -11,15 +11,15 @@ global:
     create: true
     name: "sk-agent-account"
 
-# Registry Configuration
 registry:
   enabled: true
   server: "registry.example.com"
   username: ""
   password: ""
 
-# Infra Layer - Development settings
 infra:
+  enabled: true
+  
   mysql:
     enabled: true
     persistence:
@@ -72,18 +72,6 @@ infra:
         cpu: 500m
         memory: 1Gi
 
-# RAG Layer
-rag:
-  memory:
-    enabled: true
-    persistence:
-      size: 2Gi
-  milvus:
-    enabled: false
-  ragServices:
-    enabled: false
-
-# Platform Services - All enabled for dev
 services:
   enabled: true
   
@@ -124,7 +112,6 @@ services:
   manager:
     enabled: true
 
-# Web Layer
 web:
   enabled: true
   appWeb:
@@ -139,11 +126,6 @@ web:
     service:
       type: NodePort
 
-# Node selector
-nodeSelector:
-  kubernetes.io/arch: "amd64"
-
-# Ingress
 ingress:
   enabled: true
   className: "nginx"

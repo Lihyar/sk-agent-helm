@@ -1,0 +1,68 @@
+web:
+  enabled: true
+  
+  appWeb:
+    enabled: true
+    name: app-web
+    image:
+      repository: registry.example.com/sk-agent/app-web
+      tag: "latest"
+    replicas: 1
+    service:
+      type: ClusterIP
+      port: 3000
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  
+  hospitalWeb:
+    enabled: true
+    name: hospital-web
+    image:
+      repository: registry.example.com/sk-agent/hospital-web
+      tag: "latest"
+    replicas: 1
+    service:
+      type: ClusterIP
+      port: 3000
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  
+  nginx:
+    enabled: true
+    name: nginx
+    image:
+      repository: nginx
+      tag: "alpine"
+    replicas: 1
+    config:
+      appWebUpstream: "app-web:3000"
+      hospitalWebUpstream: "hospital-web:3000"
+    service:
+      type: LoadBalancer
+
+infra:
+  enabled: false
+
+services:
+  enabled: false
+
+rag:
+  enabled: false
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10000
+  fsGroup: 10000
+
+global:
+  environment: production

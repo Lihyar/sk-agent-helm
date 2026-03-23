@@ -1,0 +1,14 @@
+{{- if and .Values.rag.enabled .Values.rag.ragServices.enabled -}}
+{{- $svc := .Values.rag.ragServices -}}
+{{- $env := list 
+  (dict "name" "MYSQL_HOST" "value" "sk-agent-mysql")
+  (dict "name" "MYSQL_PORT" "value" "3306")
+  (dict "name" "MYSQL_DATABASE" "value" $svc.mysql.database)
+  (dict "name" "MYSQL_USER" "value" $svc.mysql.user)
+  (dict "name" "REDIS_HOST" "value" "sk-agent-redis")
+  (dict "name" "REDIS_PORT" "value" "6379")
+  (dict "name" "MILVUS_HOST" "value" "sk-agent-milvus")
+  (dict "name" "MILVUS_PORT" "value" "19530")
+}}
+{{- include "python.deployment" (dict "root" . "serviceName" "rag-services" "image" $svc.image "port" ($svc.service.port | default 8080) "resources" $svc.resources "env" $env) -}}
+{{- end }}

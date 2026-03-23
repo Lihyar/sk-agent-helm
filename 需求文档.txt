@@ -1,0 +1,46 @@
+1. 微服务架构
+  1. Infra:
+    1. Mysql
+    2. Redis
+    3. Rabbitmq
+    4. Minio
+
+  2. Rag:
+    1. Memory: 依赖mysql
+    2. Milvus ：依赖minio、etcd、
+    3. rag-services：依赖mysql、redis、milvus
+    
+  3. Platform-Services:
+    1. Init-data: Java, 数据初始化，一次性任务，执行后退出。
+    2. User: Java, 依赖init-data
+    3. Domain: Java
+    4. Scheduler: Java
+    5. Agent: Python
+    6. Agent-task：Python, 依赖scheduler
+    7. Operation: Java
+    8. Storage: Java
+    9. Etl: Python, 依赖scheduler
+    10. Etl-listener: Python, 与etl镜像相同，启动命令不同
+    11. Etl-beat: Python, 与etl镜像相同，启动命令不同，依赖user、domain、operation
+    12. Assessment: Java
+    13. Hospital: Java
+    14. Tcm: Java
+    15. Notification: Java
+    16. Customer: Java
+    17. Dashborad: Java, 依赖operation  
+    18. Manager：Java, 依赖user、domain、storage、tcm、etl、customer、notification、hospital、agent、assessment
+  4. Platform-Web
+    1. App-web: Node, 依赖domain
+    2. Hospital-web: Node，依赖hospital
+    3. Nginx: Node，依赖app-web & hospital-web
+  
+2. 需求描述
+  - 使用 Helm Chart 进行应用部署和管理
+  - 采用父子 Chart 结构，父 Chart 管理整体部署，子 Chart 管理具体服务
+  - 根据服务特性选择合适的 K8s 资源类型（Deployment、StatefulSet、Job 等）
+  - 所有服务都采用StorageClass进行数据持久化
+  - 所有的镜像都使用私有镜像，私有仓库的帐号管理再serviceAccount中。
+  - 配置化管理：利用Secret、ConfigMap管理帐号、密码等
+  - 前、后端服务部署尽量使用可复用模板。
+  - 支持单机k3s部署。分为dev、pre、prod三种部署环境
+  - 支持x86_64、arm64多架构部署。

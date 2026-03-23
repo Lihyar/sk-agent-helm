@@ -1,6 +1,0 @@
-apiVersion: v2
-name: app-web
-description: A Helm chart for app-web service
-type: application
-version: 0.1.0
-appVersion: "latest"

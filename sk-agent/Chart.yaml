@@ -15,17 +15,3 @@ sources:
 maintainers:
   - name: SK Agent Team
     email: team@example.com
-
-dependencies:
-  - name: infra
-    version: "0.1.0"
-    condition: infra.enabled
-  - name: rag
-    version: "0.1.0"
-    condition: rag.enabled
-  - name: services
-    version: "0.1.0"
-    condition: services.enabled
-  - name: web
-    version: "0.1.0"
-    condition: web.enabled

@@ -1,5 +1,0 @@
-apiVersion: v2
-name: services
-description: Platform Services Layer for SK Agent
-type: application
-version: 0.1.0

@@ -1,0 +1,75 @@
+{{- if .Values.services.enabled -}}
+
+# User Service
+{{- if .Values.services.user.enabled }}
+{{- $svc := .Values.services.user }}
+{{- include "java.deployment" (dict "root" . "serviceName" "user" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# Domain Service
+{{- if .Values.services.domain.enabled }}
+{{- $svc := .Values.services.domain }}
+{{- include "java.deployment" (dict "root" . "serviceName" "domain" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# Scheduler Service
+{{- if .Values.services.scheduler.enabled }}
+{{- $svc := .Values.services.scheduler }}
+{{- include "java.deployment" (dict "root" . "serviceName" "scheduler" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# Operation Service
+{{- if .Values.services.operation.enabled }}
+{{- $svc := .Values.services.operation }}
+{{- include "java.deployment" (dict "root" . "serviceName" "operation" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# Storage Service
+{{- if .Values.services.storage.enabled }}
+{{- $svc := .Values.services.storage }}
+{{- include "java.deployment" (dict "root" . "serviceName" "storage" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# Assessment Service
+{{- if .Values.services.assessment.enabled }}
+{{- $svc := .Values.services.assessment }}
+{{- include "java.deployment" (dict "root" . "serviceName" "assessment" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# Hospital Service
+{{- if .Values.services.hospital.enabled }}
+{{- $svc := .Values.services.hospital }}
+{{- include "java.deployment" (dict "root" . "serviceName" "hospital" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# TCM Service
+{{- if .Values.services.tcm.enabled }}
+{{- $svc := .Values.services.tcm }}
+{{- include "java.deployment" (dict "root" . "serviceName" "tcm" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# Notification Service
+{{- if .Values.services.notification.enabled }}
+{{- $svc := .Values.services.notification }}
+{{- include "java.deployment" (dict "root" . "serviceName" "notification" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# Customer Service
+{{- if .Values.services.customer.enabled }}
+{{- $svc := .Values.services.customer }}
+{{- include "java.deployment" (dict "root" . "serviceName" "customer" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# Dashboard Service
+{{- if .Values.services.dashboard.enabled }}
+{{- $svc := .Values.services.dashboard }}
+{{- include "java.deployment" (dict "root" . "serviceName" "dashboard" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+# Manager Service
+{{- if .Values.services.manager.enabled }}
+{{- $svc := .Values.services.manager }}
+{{- include "java.deployment" (dict "root" . "serviceName" "manager" "image" $svc.image "port" $svc.service.port "resources" $svc.resources) -}}
+{{- end }}
+
+{{- end }}

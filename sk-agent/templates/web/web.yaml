@@ -1,0 +1,171 @@
+{{- if .Values.web.enabled -}}
+
+# App Web
+{{- if .Values.web.appWeb.enabled }}
+{{- $svc := .Values.web.appWeb }}
+{{- include "node.deployment" (dict "root" . "serviceName" "app-web" "image" $svc.image "port" 3000 "replicas" $svc.replicas "resources" $svc.resources) -}}
+{{- end }}
+
+# Hospital Web
+{{- if .Values.web.hospitalWeb.enabled }}
+{{- $svc := .Values.web.hospitalWeb }}
+{{- include "node.deployment" (dict "root" . "serviceName" "hospital-web" "image" $svc.image "port" 3000 "replicas" $svc.replicas "resources" $svc.resources) -}}
+{{- end }}
+
+# Nginx Gateway - Deployment + Service
+{{- if .Values.web.nginx.enabled }}
+{{- $svc := .Values.web.nginx }}
+# Nginx ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-gateway-config
+  labels:
+    {{- include "sk-agent.labels" . | nindent 4 }}
+data:
+  nginx.conf: |
+    worker_processes auto;
+    error_log /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+    
+    events {
+        worker_connections 1024;
+    }
+    
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+        
+        access_log /var/log/nginx/access.log main;
+        
+        sendfile on;
+        keepalive_timeout 65;
+        
+        upstream app_web_backend {
+            server app-web:3000;
+        }
+        
+        upstream hospital_web_backend {
+            server hospital-web:3000;
+        }
+        
+        server {
+            listen 80;
+            server_name localhost;
+            
+            location / {
+                proxy_pass http://app_web_backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_connect_timeout 60s;
+                proxy_send_timeout 60s;
+                proxy_read_timeout 60s;
+            }
+            
+            location /hospital {
+                proxy_pass http://hospital_web_backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_connect_timeout 60s;
+                proxy_send_timeout 60s;
+                proxy_read_timeout 60s;
+            }
+            
+            location /health {
+                return 200 'OK';
+                add_header Content-Type text/plain;
+            }
+        }
+    }
+---
+# Nginx Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-gateway
+  labels:
+    {{- include "sk-agent.labels" . | nindent 4 }}
+    layer: gateway
+    language: nginx
+spec:
+  replicas: {{ $svc.replicas }}
+  selector:
+    matchLabels:
+      {{- include "sk-agent.selectorLabels" . | nindent 6 }}
+      app: nginx-gateway
+  template:
+    metadata:
+      labels:
+        {{- include "sk-agent.selectorLabels" . | nindent 8 }}
+        app: nginx-gateway
+        layer: gateway
+    spec:
+      {{- include "sk-agent.imagePullSecret" . | nindent 6 }}
+      serviceAccountName: {{ include "sk-agent.serviceAccountName" . }}
+      containers:
+        - name: nginx
+          image: {{ printf "%s:%s" $svc.image.repository $svc.image.tag | quote }}
+          imagePullPolicy: {{ $svc.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-gateway-config
+---
+# Nginx Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-gateway
+  labels:
+    {{- include "sk-agent.labels" . | nindent 4 }}
+spec:
+  type: {{ $svc.service.type }}
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: nginx-gateway
+{{- end }}
+
+{{- end }}

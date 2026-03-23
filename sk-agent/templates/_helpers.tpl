@@ -78,8 +78,16 @@ Common image pull secret
 */}}
 {{- define "sk-agent.imagePullSecret" -}}
 {{- if .Values.global.imagePullSecrets }}
-{{- range .Values.global.imagePullSecrets }}
-- name: {{ .name }}
+imagePullSecrets:
+  {{- range .Values.global.imagePullSecrets }}
+  - name: {{ .name }}
+  {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Common image pull secrets (alias)
+*/}}
+{{- define "sk-agent.imagePullSecrets" -}}
+{{- include "sk-agent.imagePullSecret" . -}}
 {{- end }}

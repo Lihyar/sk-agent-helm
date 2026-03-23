@@ -1,2 +1,0 @@
-image: registry.example.com/sk-agent/etl:latest
-port: 8080

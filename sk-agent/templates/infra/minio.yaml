@@ -1,0 +1,129 @@
+{{- if and .Values.infra.enabled .Values.infra.minio.enabled -}}
+{{- $svc := .Values.infra.minio -}}
+{{- $fullName := printf "%s-minio" (include "sk-agent.fullname" .) -}}
+{{- $arch := .Values.global.architecture | default "amd64" -}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $fullName }}-secret
+  labels:
+    {{- include "sk-agent.labels" . | nindent 4 }}
+type: Opaque
+data:
+  minio-access-key: {{ $svc.accessKey | b64enc | quote }}
+  minio-secret-key: {{ $svc.secretKey | b64enc | quote }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "sk-agent.labels" . | nindent 4 }}
+    component: minio
+spec:
+  serviceName: {{ $fullName }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "sk-agent.selectorLabels" . | nindent 6 }}
+      app: minio
+  template:
+    metadata:
+      labels:
+        {{- include "sk-agent.selectorLabels" . | nindent 8 }}
+        app: minio
+    spec:
+      {{- include "sk-agent.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "sk-agent.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      containers:
+        - name: minio
+          {{- if eq $arch "arm64" }}
+          image: "arm64v8/minio:{{ $svc.image.tag | default "latest" }}"
+          {{- else }}
+          image: "{{ $svc.image.repository | default "minio/minio" }}:{{ $svc.image.tag | default "latest" }}"
+          {{- end }}
+          imagePullPolicy: {{ $svc.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - name: api
+              containerPort: 9000
+              protocol: TCP
+            - name: console
+              containerPort: 9001
+              protocol: TCP
+          command:
+            - minio
+            - server
+            - /data
+            - --console-address
+            - ":9001"
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName }}-secret
+                  key: minio-access-key
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName }}-secret
+                  key: minio-secret-key
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          livenessProbe:
+            tcpSocket:
+              port: api
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: api
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+          resources:
+            {{- toYaml $svc.resources | nindent 12 }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if $svc.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - {{ $svc.persistence.accessMode | default "ReadWriteOnce" }}
+        storageClassName: {{ $svc.persistence.storageClass | default "manual-sc" }}
+        resources:
+          requests:
+            storage: {{ $svc.persistence.size | default "20Gi" }}
+  {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "sk-agent.labels" . | nindent 4 }}
+spec:
+  type: {{ $svc.service.type | default "ClusterIP" }}
+  ports:
+    - port: {{ $svc.service.port | default 9000 }}
+      targetPort: api
+      protocol: TCP
+      name: api
+    - port: {{ $svc.service.consolePort | default 9001 }}
+      targetPort: console
+      protocol: TCP
+      name: console
+  selector:
+    app: minio
+{{- end }}
