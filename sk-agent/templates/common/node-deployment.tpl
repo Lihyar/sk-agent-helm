@@ -7,7 +7,7 @@ Usage: include "node.deployment" (dict "root" . "serviceName" "image" "port" "re
 {{- $serviceName := .serviceName -}}
 {{- $image := .image | default (dict "repository" "node" "tag" "18-alpine") -}}
 {{- $port := .port | default 3000 -}}
-{{- $resources := .resources | default $root.Values.web.appWeb.resources -}}
+{{- $resources := .resources | default (dict "requests" (dict "cpu" "100m" "memory" "128Mi") "limits" (dict "cpu" "500m" "memory" "512Mi")) -}}
 {{- $env := .env | default list -}}
 {{- $replicas := .replicas | default 1 -}}
 {{- $serviceType := .serviceType | default "ClusterIP" -}}

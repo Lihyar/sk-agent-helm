@@ -1,0 +1,5 @@
+apiVersion: v2
+name: svc-assessment
+description: svc-assessment Service
+version: 0.1.0
+appVersion: 1.0.0

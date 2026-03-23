@@ -1,600 +1,523 @@
-# SK Agent Microservices Architecture - Global Configuration
-# This is the parent Helm chart for the entire microservices platform
+# ==============================================================================
+# SK Agent Microservices Architecture - Parent Chart Configuration
+# Version 3: 折中方案 - 保留子Chart结构 + 复用公共模板
+# ==============================================================================
 
 # Global settings
 global:
-  # Environment: dev, pre, prod
   environment: dev
-  
-  # Architecture: amd64, arm64
   architecture: amd64
-  
-  # Image pull secrets for private registry
   imagePullSecrets:
     - name: registry-secret
-  
-  # StorageClass
   storageClass: "manual-sc"
-  
-  # Service account
   serviceAccount:
     create: true
     name: "sk-agent-account"
-    annotations: {}
-  
-  # DNS settings
   domain: "cluster.local"
 
-# Private Registry Configuration
+# Private Registry
 registry:
   enabled: true
   server: "registry.example.com"
   username: ""
   password: ""
   email: ""
-  
-# Infra Layer Configuration
-infra:
+
+# ==============================================================================
+# Infrastructure Layer - 子Chart配置 (infra-*)
+# ==============================================================================
+infra-mysql:
   enabled: true
-  
+  name: mysql
+  image:
+    repository: mysql
+    tag: "8.0"
+    pullPolicy: IfNotPresent
+  database: skagent
+  user: skuser
+  password: "mysql123"
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: "manual-sc"
+    hostPath: "/tmp/volumes/mysql"
+  service:
+    type: ClusterIP
+    port: 3306
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+
+infra-redis:
+  enabled: true
+  name: redis
+  image:
+    repository: redis
+    tag: "7.2-alpine"
+    pullPolicy: IfNotPresent
+  password: "redis123"
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClass: "manual-sc"
+    hostPath: "/tmp/volumes/redis"
+  service:
+    type: ClusterIP
+    port: 6379
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+infra-rabbitmq:
+  enabled: true
+  name: rabbitmq
+  image:
+    repository: rabbitmq
+    tag: "3.13-management"
+    pullPolicy: IfNotPresent
+  user: admin
+  password: "rabbitmq123"
+  persistence:
+    enabled: true
+    size: 8Gi
+    storageClass: "manual-sc"
+    hostPath: "/tmp/volumes/rabbitmq"
+  service:
+    type: ClusterIP
+    port: 5672
+    managementPort: 15672
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+infra-minio:
+  enabled: true
+  name: minio
+  image:
+    repository: minio/minio
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  accessKey: "minioadmin"
+  secretKey: "minioadmin123"
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: "manual-sc"
+    hostPath: "/tmp/volumes/minio"
+  service:
+    type: ClusterIP
+    port: 9000
+    consolePort: 9001
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+# ==============================================================================
+# RAG Layer - 子Chart配置 (rag-*)
+# ==============================================================================
+rag-memory:
+  enabled: true
+  name: memory
+  image:
+    repository: registry.example.com/sk-agent/memory
+    tag: "latest"
   mysql:
+    database: "memory"
+    user: "memoryuser"
+    password: "memory123"
+  persistence:
     enabled: true
-    name: mysql
-    image:
-      repository: mysql
-      tag: "8.0"
-      pullPolicy: IfNotPresent
-    database: skagent
-    user: skuser
-    password: "mysql123"
-    persistence:
-      enabled: true
-      size: 10Gi
-      storageClass: "manual-sc"
-      hostPath: "/tmp/volumes/mysql"
-    service:
-      type: ClusterIP
-      port: 3306
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 4Gi
-  
-  redis:
-    enabled: true
-    name: redis
-    image:
-      repository: redis
-      tag: "7.2-alpine"
-      pullPolicy: IfNotPresent
-    mode: standalone
-    password: "redis123"
-    persistence:
-      enabled: true
-      size: 2Gi
-      storageClass: "manual-sc"
-      hostPath: "/tmp/volumes/redis"
-    service:
-      type: ClusterIP
-      port: 6379
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        cpu: 500m
-        memory: 1Gi
-  
-  rabbitmq:
-    enabled: true
-    name: rabbitmq
-    image:
-      repository: rabbitmq
-      tag: "3.13-management"
-      pullPolicy: IfNotPresent
-    user: admin
-    password: "rabbitmq123"
-    persistence:
-      enabled: true
-      size: 8Gi
-      storageClass: "manual-sc"
-      hostPath: "/tmp/volumes/rabbitmq"
-    service:
-      type: ClusterIP
-      port: 5672
-      managementPort: 15672
-    resources:
-      requests:
-        cpu: 250m
-        memory: 512Mi
-      limits:
-        cpu: 1000m
-        memory: 2Gi
-  
-  minio:
-    enabled: true
-    name: minio
-    image:
-      repository: minio/minio
-      tag: "latest"
-      pullPolicy: IfNotPresent
-    accessKey: "minioadmin"
-    secretKey: "minioadmin123"
-    persistence:
-      enabled: true
-      size: 20Gi
-      storageClass: "manual-sc"
-      hostPath: "/tmp/volumes/minio"
-    service:
-      type: ClusterIP
-      port: 9000
-      consolePort: 9001
-    resources:
-      requests:
-        cpu: 250m
-        memory: 512Mi
-      limits:
-        cpu: 1000m
-        memory: 2Gi
+    size: 5Gi
+    storageClass: "manual-sc"
+    hostPath: "/tmp/volumes/memory"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
 
-# RAG Layer Configuration
-rag:
+rag-milvus:
   enabled: true
-  
-  memory:
+  name: milvus
+  image:
+    repository: milvusdb/milvus
+    tag: "v2.3.3"
+  persistence:
     enabled: true
-    name: memory
-    image:
-      repository: registry.example.com/sk-agent/memory
-      tag: "latest"
-    mysql:
-      database: "memory"
-      user: "memoryuser"
-      password: "memory123"
-    persistence:
-      enabled: true
-      size: 5Gi
-      storageClass: "manual-sc"
-      hostPath: "/tmp/volumes/memory"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 4Gi
-  
-  milvus:
-    enabled: true
-    name: milvus
-    image:
-      repository: milvusdb/milvus
-      tag: "v2.3.3"
-    persistence:
-      enabled: true
-      size: 10Gi
-      storageClass: "manual-sc"
-    etcd:
-      enabled: true
-      persistence:
-        size: 2Gi
-    minio:
-      enabled: true
-      persistence:
-        size: 10Gi
-    service:
-      type: ClusterIP
-      port: 19530
-    resources:
-      requests:
-        cpu: 1000m
-        memory: 4Gi
-      limits:
-        cpu: 4000m
-        memory: 16Gi
-  
-  ragServices:
-    enabled: true
-    name: rag-services
-    image:
-      repository: registry.example.com/sk-agent/rag-services
-      tag: "latest"
-    mysql:
-      database: "rag"
-      user: "raguser"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 4Gi
+    size: 10Gi
+    storageClass: "manual-sc"
+  service:
+    type: ClusterIP
+    port: 19530
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 4Gi
+    limits:
+      cpu: 4000m
+      memory: 16Gi
 
-# Platform Services Layer Configuration
-services:
+rag-services:
   enabled: true
-  
-  # Init Data - One-time Job
-  initData:
-    enabled: true
-    name: init-data
-    image:
-      repository: registry.example.com/sk-agent/init-data
-      tag: "latest"
-    # Run policy: Never, Always, IfNotPresent, OnFailure
-    restartPolicy: OnFailure
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        cpu: 500m
-        memory: 1Gi
-  
-  user:
-    enabled: true
-    name: user
-    image:
-      repository: registry.example.com/sk-agent/user
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  domain:
-    enabled: true
-    name: domain
-    image:
-      repository: registry.example.com/sk-agent/domain
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  scheduler:
-    enabled: true
-    name: scheduler
-    image:
-      repository: registry.example.com/sk-agent/scheduler
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  agent:
-    enabled: true
-    name: agent
-    image:
-      repository: registry.example.com/sk-agent/agent
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 4Gi
-  
-  agentTask:
-    enabled: true
-    name: agent-task
-    image:
-      repository: registry.example.com/sk-agent/agent
-      tag: "latest"
-    command: ["python", "-m", "agent.task"]
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 4Gi
-  
-  operation:
-    enabled: true
-    name: operation
-    image:
-      repository: registry.example.com/sk-agent/operation
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  storage:
-    enabled: true
-    name: storage
-    image:
-      repository: registry.example.com/sk-agent/storage
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  etl:
-    enabled: true
-    name: etl
-    image:
-      repository: registry.example.com/sk-agent/etl
-      tag: "latest"
-    command: ["python", "-m", "etl.service"]
-    replicas: 1
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 4Gi
-  
-  etlListener:
-    enabled: true
-    name: etl-listener
-    image:
-      repository: registry.example.com/sk-agent/etl
-      tag: "latest"
-    command: ["python", "-m", "etl.listener"]
-    replicas: 1
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  etlBeat:
-    enabled: true
-    name: etl-beat
-    image:
-      repository: registry.example.com/sk-agent/etl
-      tag: "latest"
-    command: ["python", "-m", "etl.beat"]
-    replicas: 1
-    resources:
-      requests:
-        cpu: 200m
-        memory: 256Mi
-      limits:
-        cpu: 500m
-        memory: 1Gi
-  
-  assessment:
-    enabled: true
-    name: assessment
-    image:
-      repository: registry.example.com/sk-agent/assessment
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  hospital:
-    enabled: true
-    name: hospital
-    image:
-      repository: registry.example.com/sk-agent/hospital
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  tcm:
-    enabled: true
-    name: tcm
-    image:
-      repository: registry.example.com/sk-agent/tcm
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  notification:
-    enabled: true
-    name: notification
-    image:
-      repository: registry.example.com/sk-agent/notification
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 200m
-        memory: 512Mi
-      limits:
-        cpu: 1000m
-        memory: 2Gi
-  
-  customer:
-    enabled: true
-    name: customer
-    image:
-      repository: registry.example.com/sk-agent/customer
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  dashboard:
-    enabled: true
-    name: dashboard
-    image:
-      repository: registry.example.com/sk-agent/dashboard
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-  
-  manager:
-    enabled: true
-    name: manager
-    image:
-      repository: registry.example.com/sk-agent/manager
-      tag: "latest"
-    service:
-      type: ClusterIP
-      port: 8080
-    resources:
-      requests:
-        cpu: 500m
-        memory: 1Gi
-      limits:
-        cpu: 2000m
-        memory: 2Gi
+  name: rag-services
+  image:
+    repository: registry.example.com/sk-agent/rag-services
+    tag: "latest"
+  mysql:
+    database: "rag"
+    user: "raguser"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
 
-# Web Layer Configuration
-web:
+# ==============================================================================
+# Platform Services Layer - 子Chart配置 (svc-*)
+# ==============================================================================
+svc-user:
   enabled: true
-  
-  appWeb:
-    enabled: true
-    name: app-web
-    image:
-      repository: registry.example.com/sk-agent/app-web
-      tag: "latest"
-    replicas: 1
-    service:
-      type: ClusterIP
-      port: 3000
-    resources:
-      requests:
-        cpu: 100m
-        memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 512Mi
-  
-  hospitalWeb:
-    enabled: true
-    name: hospital-web
-    image:
-      repository: registry.example.com/sk-agent/hospital-web
-      tag: "latest"
-    replicas: 1
-    service:
-      type: ClusterIP
-      port: 3000
-    resources:
-      requests:
-        cpu: 100m
-        memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 512Mi
-  
-  nginx:
-    enabled: true
-    name: nginx
-    image:
-      repository: nginx
-      tag: "alpine"
-    replicas: 1
-    config:
-      appWebUpstream: "app-web:3000"
-      hospitalWebUpstream: "hospital-web:3000"
-    service:
-      type: LoadBalancer
-      port: 80
-    resources:
-      requests:
-        cpu: 100m
-        memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 512Mi
+  name: user
+  image:
+    repository: registry.example.com/sk-agent/user
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
 
-# Node selector
+svc-domain:
+  enabled: true
+  name: domain
+  image:
+    repository: registry.example.com/sk-agent/domain
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+svc-scheduler:
+  enabled: true
+  name: scheduler
+  image:
+    repository: registry.example.com/sk-agent/scheduler
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+svc-agent:
+  enabled: true
+  name: agent
+  image:
+    repository: registry.example.com/sk-agent/agent
+    tag: "latest"
+  command: ["python", "-m", "agent.service"]
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+
+svc-operation:
+  enabled: true
+  name: operation
+  image:
+    repository: registry.example.com/sk-agent/operation
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+svc-storage:
+  enabled: true
+  name: storage
+  image:
+    repository: registry.example.com/sk-agent/storage
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+svc-etl:
+  enabled: true
+  name: etl
+  image:
+    repository: registry.example.com/sk-agent/etl
+    tag: "latest"
+  command: ["python", "-m", "etl.service"]
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+
+svc-assessment:
+  enabled: true
+  name: assessment
+  image:
+    repository: registry.example.com/sk-agent/assessment
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+svc-hospital:
+  enabled: true
+  name: hospital
+  image:
+    repository: registry.example.com/sk-agent/hospital
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+svc-tcm:
+  enabled: true
+  name: tcm
+  image:
+    repository: registry.example.com/sk-agent/tcm
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+svc-notification:
+  enabled: true
+  name: notification
+  image:
+    repository: registry.example.com/sk-agent/notification
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+svc-customer:
+  enabled: true
+  name: customer
+  image:
+    repository: registry.example.com/sk-agent/customer
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+svc-dashboard:
+  enabled: true
+  name: dashboard
+  image:
+    repository: registry.example.com/sk-agent/dashboard
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+svc-manager:
+  enabled: true
+  name: manager
+  image:
+    repository: registry.example.com/sk-agent/manager
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+# ==============================================================================
+# Web Layer - 子Chart配置 (web-*)
+# ==============================================================================
+web-app:
+  enabled: true
+  name: app-web
+  image:
+    repository: registry.example.com/sk-agent/app-web
+    tag: "latest"
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+web-hospital:
+  enabled: true
+  name: hospital-web
+  image:
+    repository: registry.example.com/sk-agent/hospital-web
+    tag: "latest"
+  replicas: 1
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+web-nginx:
+  enabled: true
+  name: nginx
+  image:
+    repository: nginx
+    tag: "alpine"
+  replicas: 1
+  config:
+    appWebUpstream: "app-web:3000"
+    hospitalWebUpstream: "hospital-web:3000"
+  service:
+    type: LoadBalancer
+    port: 80
+  ingress:
+    enabled: false
+    className: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    hosts:
+      - host: "api.sk-agent.com"
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: sk-agent-tls
+        hosts:
+          - "api.sk-agent.com"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ==============================================================================
+# Global Settings
+# ==============================================================================
 nodeSelector:
   kubernetes.io/arch: "amd64"
 
@@ -602,19 +525,15 @@ tolerations: []
 
 affinity: {}
 
-# Security Context
 securityContext:
   runAsUser: 1000
   runAsGroup: 1000
   fsGroup: 1000
 
-# Pod annotations
 podAnnotations: {}
 
-# Pod labels
 podLabels: {}
 
-# Ingress configuration
 ingress:
   enabled: false
   className: "nginx"

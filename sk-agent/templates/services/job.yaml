@@ -1,3 +1,0 @@
-{{- if .Values.services.initData.enabled }}
-{{- include "init.job" (dict "root" . "jobName" "init-data" "image" .Values.services.initData.image "resources" .Values.services.initData.resources) -}}
-{{- end }}

@@ -7,7 +7,7 @@ Usage: include "java.deployment" (dict "root" . "serviceName" "user" "image" "po
 {{- $serviceName := .serviceName -}}
 {{- $image := .image | default (dict "repository" "nginx" "tag" "latest") -}}
 {{- $port := .port | default 8080 -}}
-{{- $resources := .resources | default $root.Values.services.user.resources -}}
+{{- $resources := .resources | default (dict "requests" (dict "cpu" "500m" "memory" "1Gi") "limits" (dict "cpu" "2000m" "memory" "2Gi")) -}}
 {{- $env := .env | default list -}}
 {{- $command := .command | default nil -}}
 {{- $args := .args | default nil -}}

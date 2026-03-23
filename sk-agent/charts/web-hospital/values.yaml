@@ -1,0 +1,9 @@
+name: hospital-web
+image:
+  repository: registry.example.com/sk-agent/hospital-web
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 3000
+replicas: 1

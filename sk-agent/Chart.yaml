@@ -1,9 +1,84 @@
 apiVersion: v2
 name: sk-agent
-description: A Helm chart for SK Agent Microservices Architecture
+description: SK Agent Microservices Architecture - Parent Chart
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
+
+dependencies:
+  - name: infra-mysql
+    version: "0.1.0"
+    condition: infra-mysql.enabled
+  - name: infra-redis
+    version: "0.1.0"
+    condition: infra-redis.enabled
+  - name: infra-rabbitmq
+    version: "0.1.0"
+    condition: infra-rabbitmq.enabled
+  - name: infra-minio
+    version: "0.1.0"
+    condition: infra-minio.enabled
+  - name: rag-memory
+    version: "0.1.0"
+    condition: rag-memory.enabled
+  - name: rag-milvus
+    version: "0.1.0"
+    condition: rag-milvus.enabled
+  - name: rag-services
+    version: "0.1.0"
+    condition: rag-services.enabled
+  - name: svc-user
+    version: "0.1.0"
+    condition: svc-user.enabled
+  - name: svc-domain
+    version: "0.1.0"
+    condition: svc-domain.enabled
+  - name: svc-scheduler
+    version: "0.1.0"
+    condition: svc-scheduler.enabled
+  - name: svc-agent
+    version: "0.1.0"
+    condition: svc-agent.enabled
+  - name: svc-operation
+    version: "0.1.0"
+    condition: svc-operation.enabled
+  - name: svc-storage
+    version: "0.1.0"
+    condition: svc-storage.enabled
+  - name: svc-etl
+    version: "0.1.0"
+    condition: svc-etl.enabled
+  - name: svc-assessment
+    version: "0.1.0"
+    condition: svc-assessment.enabled
+  - name: svc-hospital
+    version: "0.1.0"
+    condition: svc-hospital.enabled
+  - name: svc-tcm
+    version: "0.1.0"
+    condition: svc-tcm.enabled
+  - name: svc-notification
+    version: "0.1.0"
+    condition: svc-notification.enabled
+  - name: svc-customer
+    version: "0.1.0"
+    condition: svc-customer.enabled
+  - name: svc-dashboard
+    version: "0.1.0"
+    condition: svc-dashboard.enabled
+  - name: svc-manager
+    version: "0.1.0"
+    condition: svc-manager.enabled
+  - name: web-app
+    version: "0.1.0"
+    condition: web-app.enabled
+  - name: web-hospital
+    version: "0.1.0"
+    condition: web-hospital.enabled
+  - name: web-nginx
+    version: "0.1.0"
+    condition: web-nginx.enabled
+
 keywords:
   - microservices
   - sk-agent

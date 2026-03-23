@@ -1,0 +1,19 @@
+name: nginx
+image:
+  repository: nginx
+  tag: alpine
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 80
+replicas: 1
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: ""
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []

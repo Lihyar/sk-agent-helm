@@ -1,0 +1,16 @@
+name: tcm
+image:
+  repository: registry.example.com/sk-agent/tcm
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 8080
+replicas: 1
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 2Gi

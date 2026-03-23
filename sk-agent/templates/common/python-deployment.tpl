@@ -7,7 +7,7 @@ Usage: include "python.deployment" (dict "root" . "serviceName" "image" "port" "
 {{- $serviceName := .serviceName -}}
 {{- $image := .image | default (dict "repository" "python" "tag" "3.11") -}}
 {{- $port := .port | default 8080 -}}
-{{- $resources := .resources | default $root.Values.services.agent.resources -}}
+{{- $resources := .resources | default (dict "requests" (dict "cpu" "500m" "memory" "1Gi") "limits" (dict "cpu" "2000m" "memory" "4Gi")) -}}
 {{- $env := .env | default list -}}
 {{- $command := .command | default (list "python" "-m" "uvicorn" "app.main:app" "--host" "0.0.0.0" "--port" (quote $port)) -}}
 {{- $replicas := .replicas | default 1 -}}

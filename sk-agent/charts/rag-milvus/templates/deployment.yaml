@@ -1,0 +1,8 @@
+{{ include "statefulset" (dict 
+  "root" . 
+  "name" .Values.name
+  "image" .Values.image 
+  "port" .Values.service.port 
+  "persistence" (dict "enabled" true "size" .Values.persistence.size "storageClass" .Values.persistence.storageClass)
+  "resources" .Values.resources
+) }}

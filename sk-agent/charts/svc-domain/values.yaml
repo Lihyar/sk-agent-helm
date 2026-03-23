@@ -1,0 +1,11 @@
+name: domain
+image:
+  repository: registry.example.com/sk-agent/domain
+  tag: latest
+
+service:
+  port: 8080
+  type: ClusterIP
+
+resources: {}
+replicas: 1

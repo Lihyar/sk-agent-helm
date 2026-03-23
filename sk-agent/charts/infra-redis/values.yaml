@@ -1,0 +1,16 @@
+name: redis
+image:
+  repository: redis
+  tag: 7.2-alpine
+persistence:
+  size: 2Gi
+  storageClass: manual-sc
+service:
+  port: 6379
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi

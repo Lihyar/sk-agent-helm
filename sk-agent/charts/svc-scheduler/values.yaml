@@ -1,0 +1,9 @@
+name: scheduler
+
+image:
+  repository: registry.example.com/sk-agent/scheduler
+  tag: latest
+
+service:
+  port: 8080
+  type: ClusterIP

@@ -1,0 +1,9 @@
+name: app-web
+image:
+  repository: registry.example.com/sk-agent/app-web
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 3000
+replicas: 1

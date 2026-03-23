@@ -1,0 +1,16 @@
+name: mysql
+image:
+  repository: mysql
+  tag: "8.0"
+persistence:
+  size: 10Gi
+  storageClass: manual-sc
+service:
+  port: 3306
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 2000m
+    memory: 4Gi
