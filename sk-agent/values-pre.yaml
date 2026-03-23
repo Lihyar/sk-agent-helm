@@ -1,0 +1,163 @@
+# Pre-Production Environment Configuration
+# Usage: helm install sk-agent-pre sk-agent -f values-pre.yaml
+
+global:
+  environment: pre
+  architecture: amd64
+  storageClass: "standard"
+  imagePullSecrets:
+    - name: registry-secret
+  serviceAccount:
+    create: true
+    name: "sk-agent-account"
+
+# Registry Configuration
+registry:
+  enabled: true
+  server: "registry.example.com"
+  username: ""
+  password: ""
+
+# Infra Layer - Pre-prod settings
+infra:
+  mysql:
+    enabled: true
+    persistence:
+      size: 20Gi
+      storageClass: "standard"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+
+  redis:
+    enabled: true
+    persistence:
+      size: 5Gi
+      storageClass: "standard"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+  rabbitmq:
+    enabled: true
+    persistence:
+      size: 10Gi
+      storageClass: "standard"
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+  minio:
+    enabled: true
+    persistence:
+      size: 50Gi
+      storageClass: "standard"
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+# RAG Layer
+rag:
+  memory:
+    enabled: true
+    persistence:
+      size: 10Gi
+  milvus:
+    enabled: true
+    persistence:
+      size: 50Gi
+  ragServices:
+    enabled: true
+
+# Platform Services - All enabled for pre
+services:
+  enabled: true
+  
+  initData:
+    enabled: true
+  user:
+    enabled: true
+  domain:
+    enabled: true
+  scheduler:
+    enabled: true
+  agent:
+    enabled: true
+  agentTask:
+    enabled: true
+  operation:
+    enabled: true
+  storage:
+    enabled: true
+  etl:
+    enabled: true
+  etlListener:
+    enabled: true
+  etlBeat:
+    enabled: true
+  assessment:
+    enabled: true
+  hospital:
+    enabled: true
+  tcm:
+    enabled: true
+  notification:
+    enabled: true
+  customer:
+    enabled: true
+  dashboard:
+    enabled: true
+  manager:
+    enabled: true
+
+# Web Layer
+web:
+  enabled: true
+  appWeb:
+    enabled: true
+    replicas: 2
+  hospitalWeb:
+    enabled: true
+    replicas: 2
+  nginx:
+    enabled: true
+    replicas: 2
+    service:
+      type: LoadBalancer
+
+# Node selector
+nodeSelector:
+  kubernetes.io/arch: "amd64"
+
+# Ingress
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: sk-agent-pre.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: sk-agent-pre-tls
+      hosts:
+        - sk-agent-pre.example.com

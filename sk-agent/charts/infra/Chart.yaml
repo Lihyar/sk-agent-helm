@@ -1,0 +1,19 @@
+apiVersion: v2
+name: infra
+description: Infrastructure Layer for SK Agent
+type: application
+version: 0.1.0
+
+dependencies:
+  - name: mysql
+    version: "0.1.0"
+    condition: infra.mysql.enabled
+  - name: redis
+    version: "0.1.0"
+    condition: infra.redis.enabled
+  - name: rabbitmq
+    version: "0.1.0"
+    condition: infra.rabbitmq.enabled
+  - name: minio
+    version: "0.1.0"
+    condition: infra.minio.enabled

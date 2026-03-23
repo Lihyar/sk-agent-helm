@@ -1,0 +1,17 @@
+apiVersion: v2
+name: python-service
+description: A generic Python microservice template for sk-agent platform
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - python
+  - microservice
+  - uvicorn
+  - sk-agent
+home: https://github.com/sk-agent/sk-agent
+sources:
+  - https://github.com/sk-agent/sk-agent
+maintainers:
+  - name: SK-Agent Team
+    email: team@sk-agent.com

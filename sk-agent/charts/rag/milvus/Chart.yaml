@@ -1,0 +1,13 @@
+apiVersion: v2
+name: milvus
+description: A Milvus vector database Helm chart for sk-agent microservices platform
+type: application
+version: 0.1.0
+appVersion: "2.3.3"
+keywords:
+  - milvus
+  - vector database
+  - rag
+  - sk-agent
+maintainers:
+  - name: sk-agent team

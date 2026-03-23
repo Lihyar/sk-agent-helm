@@ -1,0 +1,16 @@
+apiVersion: v2
+name: rag
+description: RAG Layer for SK Agent
+type: application
+version: 0.1.0
+
+dependencies:
+  - name: memory
+    version: "0.1.0"
+    condition: rag.memory.enabled
+  - name: milvus
+    version: "0.1.0"
+    condition: rag.milvus.enabled
+  - name: rag-services
+    version: "0.1.0"
+    condition: rag.ragServices.enabled

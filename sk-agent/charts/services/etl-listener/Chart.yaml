@@ -1,0 +1,4 @@
+apiVersion: v2
+name: etl-listener
+description: Python ETL listener service
+version: 0.1.0

@@ -1,0 +1,113 @@
+image:
+  repository: milvusdb/milvus
+  tag: "v2.3.3"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 19530
+  grpcPort: 19531
+
+etcd:
+  enabled: true
+  image:
+    repository: quay.io/coreos/etcd
+    tag: v3.5.5
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 8Gi
+    accessMode: ReadWriteOnce
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+minio:
+  enabled: true
+  image:
+    repository: minio/minio
+    tag: RELEASE.2023-03-20T20-16-18Z
+  service:
+    port: 9000
+    consolePort: 9001
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 20Gi
+    accessMode: ReadWriteOnce
+  rootUser: minioadmin
+  rootPassword: minioadmin
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+persistence:
+  enabled: true
+  storageClass: ""
+  size: 50Gi
+  accessMode: ReadWriteOnce
+
+resources:
+  requests:
+    cpu: 2
+    memory: 8Gi
+  limits:
+    cpu: 4
+    memory: 16Gi
+
+securityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+probes:
+  liveness:
+    initialDelaySeconds: 90
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 5
+  readiness:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+clusterDomain: cluster.local
+
+config:
+  log:
+    level: info
+    format: text
+  etcd:
+    endpoints:
+      - etcd:2379
+  minio:
+    address: minio:9000
+  storage:
+    type: minio
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -1,0 +1,156 @@
+# Development Environment Configuration
+# Usage: helm install sk-agent-dev sk-agent -f values-dev.yaml
+
+global:
+  environment: dev
+  architecture: amd64
+  storageClass: "manual-sc"
+  imagePullSecrets:
+    - name: registry-secret
+  serviceAccount:
+    create: true
+    name: "sk-agent-account"
+
+# Registry Configuration
+registry:
+  enabled: true
+  server: "registry.example.com"
+  username: ""
+  password: ""
+
+# Infra Layer - Development settings
+infra:
+  mysql:
+    enabled: true
+    persistence:
+      size: 5Gi
+      hostPath: "/tmp/volumes/mysql-dev"
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+  redis:
+    enabled: true
+    persistence:
+      size: 1Gi
+      hostPath: "/tmp/volumes/redis-dev"
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 250m
+        memory: 512Mi
+
+  rabbitmq:
+    enabled: true
+    persistence:
+      size: 4Gi
+      hostPath: "/tmp/volumes/rabbitmq-dev"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+  minio:
+    enabled: true
+    persistence:
+      size: 10Gi
+      hostPath: "/tmp/volumes/minio-dev"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+# RAG Layer
+rag:
+  memory:
+    enabled: true
+    persistence:
+      size: 2Gi
+  milvus:
+    enabled: false
+  ragServices:
+    enabled: false
+
+# Platform Services - All enabled for dev
+services:
+  enabled: true
+  
+  initData:
+    enabled: true
+  user:
+    enabled: true
+  domain:
+    enabled: true
+  scheduler:
+    enabled: true
+  agent:
+    enabled: true
+  agentTask:
+    enabled: true
+  operation:
+    enabled: true
+  storage:
+    enabled: true
+  etl:
+    enabled: true
+  etlListener:
+    enabled: true
+  etlBeat:
+    enabled: true
+  assessment:
+    enabled: true
+  hospital:
+    enabled: true
+  tcm:
+    enabled: true
+  notification:
+    enabled: true
+  customer:
+    enabled: true
+  dashboard:
+    enabled: true
+  manager:
+    enabled: true
+
+# Web Layer
+web:
+  enabled: true
+  appWeb:
+    enabled: true
+    replicas: 1
+  hospitalWeb:
+    enabled: true
+    replicas: 1
+  nginx:
+    enabled: true
+    replicas: 1
+    service:
+      type: NodePort
+
+# Node selector
+nodeSelector:
+  kubernetes.io/arch: "amd64"
+
+# Ingress
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: sk-agent-dev.local
+      paths:
+        - path: /
+          pathType: Prefix

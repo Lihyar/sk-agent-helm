@@ -1,0 +1,4 @@
+apiVersion: v2
+name: etl-beat
+description: Python ETL beat scheduler service
+version: 0.1.0

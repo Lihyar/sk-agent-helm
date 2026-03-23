@@ -1,0 +1,15 @@
+dependencies:
+- name: infra
+  repository: ""
+  version: 0.1.0
+- name: rag
+  repository: ""
+  version: 0.1.0
+- name: services
+  repository: ""
+  version: 0.1.0
+- name: web
+  repository: ""
+  version: 0.1.0
+digest: sha256:8f741d9de8628e5e08bced974085667b701f053d474103832423673e7e8573c2
+generated: "2026-03-23T11:18:25.671755+08:00"

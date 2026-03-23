@@ -1,0 +1,196 @@
+# Production Environment Configuration
+# Usage: helm install sk-agent-prod sk-agent -f values-prod.yaml
+
+global:
+  environment: prod
+  architecture: amd64
+  storageClass: "standard"
+  imagePullSecrets:
+    - name: registry-secret
+  serviceAccount:
+    create: true
+    name: "sk-agent-account"
+
+# Registry Configuration
+registry:
+  enabled: true
+  server: "registry.example.com"
+  username: ""
+  password: ""
+
+# Infra Layer - Production settings with high resources
+infra:
+  mysql:
+    enabled: true
+    persistence:
+      size: 100Gi
+      storageClass: "standard"
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 2Gi
+      limits:
+        cpu: 4000m
+        memory: 8Gi
+
+  redis:
+    enabled: true
+    persistence:
+      size: 20Gi
+      storageClass: "standard"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+
+  rabbitmq:
+    enabled: true
+    persistence:
+      size: 50Gi
+      storageClass: "standard"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+
+  minio:
+    enabled: true
+    persistence:
+      size: 500Gi
+      storageClass: "standard"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+
+# RAG Layer
+rag:
+  memory:
+    enabled: true
+    persistence:
+      size: 50Gi
+  milvus:
+    enabled: true
+    persistence:
+      size: 200Gi
+  ragServices:
+    enabled: true
+
+# Platform Services - Production settings
+services:
+  enabled: true
+  
+  initData:
+    enabled: true
+  user:
+    enabled: true
+    replicas: 2
+  domain:
+    enabled: true
+    replicas: 2
+  scheduler:
+    enabled: true
+    replicas: 2
+  agent:
+    enabled: true
+    replicas: 3
+  agentTask:
+    enabled: true
+    replicas: 2
+  operation:
+    enabled: true
+    replicas: 2
+  storage:
+    enabled: true
+    replicas: 2
+  etl:
+    enabled: true
+    replicas: 2
+  etlListener:
+    enabled: true
+    replicas: 2
+  etlBeat:
+    enabled: true
+    replicas: 1
+  assessment:
+    enabled: true
+    replicas: 2
+  hospital:
+    enabled: true
+    replicas: 2
+  tcm:
+    enabled: true
+    replicas: 2
+  notification:
+    enabled: true
+    replicas: 2
+  customer:
+    enabled: true
+    replicas: 2
+  dashboard:
+    enabled: true
+    replicas: 2
+  manager:
+    enabled: true
+    replicas: 3
+
+# Web Layer - Production settings
+web:
+  enabled: true
+  appWeb:
+    enabled: true
+    replicas: 3
+  hospitalWeb:
+    enabled: true
+    replicas: 3
+  nginx:
+    enabled: true
+    replicas: 3
+    service:
+      type: LoadBalancer
+
+# Node selector
+nodeSelector:
+  kubernetes.io/arch: "amd64"
+
+# Pod anti-affinity for production
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - nginx
+          topologyKey: kubernetes.io/hostname
+
+# Ingress
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+  hosts:
+    - host: sk-agent.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: sk-agent-prod-tls
+      hosts:
+        - sk-agent.example.com
