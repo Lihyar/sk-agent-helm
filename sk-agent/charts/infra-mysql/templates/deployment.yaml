@@ -3,6 +3,7 @@
   "name" .Values.name
   "image" .Values.image 
   "port" .Values.service.port 
-  "persistence" (dict "enabled" true "size" .Values.persistence.size "storageClass" .Values.persistence.storageClass)
+  "volumes" .Values.volumes
+  "env" .Values.env
   "resources" .Values.resources
 ) }}

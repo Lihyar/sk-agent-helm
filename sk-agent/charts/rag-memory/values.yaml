@@ -2,11 +2,14 @@ name: memory
 image:
   repository: registry.example.com/sk-agent/memory
   tag: latest
-persistence:
-  size: 5Gi
-  storageClass: manual-sc
+  pullPolicy: IfNotPresent
 service:
   port: 8080
+volumes:
+  - name: data
+    mountPath: /data
+    size: 5Gi
+    storageClass: manual-sc
 resources:
   requests:
     cpu: 500m

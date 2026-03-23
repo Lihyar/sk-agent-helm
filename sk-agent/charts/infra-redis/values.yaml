@@ -2,11 +2,21 @@ name: redis
 image:
   repository: redis
   tag: 7.2-alpine
-persistence:
-  size: 2Gi
-  storageClass: manual-sc
+  pullPolicy: IfNotPresent
 service:
   port: 6379
+env:
+  - name: REDIS_PASSWORD
+    value: "redis123"
+volumes:
+  - name: data
+    mountPath: /data
+    size: 2Gi
+    storageClass: manual-sc
+  - name: conf
+    mountPath: /usr/local/etc/redis
+    size: 100Mi
+    storageClass: manual-sc
 resources:
   requests:
     cpu: 100m

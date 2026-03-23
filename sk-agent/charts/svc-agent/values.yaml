@@ -11,6 +11,22 @@ service:
   type: ClusterIP
   port: 8080
 replicas: 1
+config:
+  mysql:
+    host: mysql
+    port: 3306
+    database: skagent
+    user: skuser
+    password: mysql123
+  redis:
+    host: redis
+    port: 6379
+  milvus:
+    host: milvus
+    port: 19530
+env:
+  - name: PYTHON_ENV
+    value: dev
 resources:
   requests:
     cpu: 500m

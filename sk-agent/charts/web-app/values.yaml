@@ -7,3 +7,15 @@ service:
   type: ClusterIP
   port: 3000
 replicas: 1
+config:
+  apiUrl: http://nginx
+env:
+  - name: NODE_ENV
+    value: development
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

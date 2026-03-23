@@ -2,11 +2,19 @@ name: minio
 image:
   repository: minio/minio
   tag: latest
-persistence:
-  size: 20Gi
-  storageClass: manual-sc
+  pullPolicy: IfNotPresent
 service:
   port: 9000
+env:
+  - name: MINIO_ROOT_USER
+    value: minioadmin
+  - name: MINIO_ROOT_PASSWORD
+    value: minioadmin123
+volumes:
+  - name: data
+    mountPath: /data
+    size: 20Gi
+    storageClass: manual-sc
 resources:
   requests:
     cpu: 250m

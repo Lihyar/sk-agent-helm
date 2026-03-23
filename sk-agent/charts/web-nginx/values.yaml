@@ -7,9 +7,12 @@ service:
   type: ClusterIP
   port: 80
 replicas: 1
+config:
+  appWebUpstream: app-web:3000
+  hospitalWebUpstream: hospital-web:3000
 ingress:
   enabled: false
-  className: "nginx"
+  className: nginx
   annotations: {}
   hosts:
     - host: ""
@@ -17,3 +20,10 @@ ingress:
         - path: /
           pathType: Prefix
   tls: []
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

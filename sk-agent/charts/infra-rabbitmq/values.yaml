@@ -2,11 +2,19 @@ name: rabbitmq
 image:
   repository: rabbitmq
   tag: 3.13-management
-persistence:
-  size: 8Gi
-  storageClass: manual-sc
+  pullPolicy: IfNotPresent
 service:
   port: 5672
+env:
+  - name: RABBITMQ_DEFAULT_USER
+    value: admin
+  - name: RABBITMQ_DEFAULT_PASS
+    value: rabbitmq123
+volumes:
+  - name: data
+    mountPath: /var/lib/rabbitmq
+    size: 8Gi
+    storageClass: manual-sc
 resources:
   requests:
     cpu: 250m

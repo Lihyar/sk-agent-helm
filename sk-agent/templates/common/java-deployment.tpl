@@ -1,18 +1,25 @@
 {{/*
-Java Service Deployment Template
-Usage: include "java.deployment" (dict "root" . "serviceName" "user" "image" "port" "resources" ...)
+Java Service Deployment Template with ConfigMap Support
+Usage: include "java.deployment" (dict "root" . "serviceName" "image" "port" "resources" "configMap" ...)
 */}}
 {{- define "java.deployment" -}}
 {{- $root := .root -}}
 {{- $serviceName := .serviceName -}}
 {{- $image := .image | default (dict "repository" "nginx" "tag" "latest") -}}
+{{- $imagePullPolicy := .imagePullPolicy | default "IfNotPresent" -}}
 {{- $port := .port | default 8080 -}}
 {{- $resources := .resources | default (dict "requests" (dict "cpu" "500m" "memory" "1Gi") "limits" (dict "cpu" "2000m" "memory" "2Gi")) -}}
 {{- $env := .env | default list -}}
-{{- $command := .command | default nil -}}
-{{- $args := .args | default nil -}}
+{{- $command := .command -}}
+{{- $args := .args -}}
 {{- $replicas := .replicas | default 1 -}}
 {{- $serviceType := .serviceType | default "ClusterIP" -}}
+{{- $configMap := .configMap -}}
+{{- $configMapVolume := .configMapVolume -}}
+{{- $secretName := .secretName -}}
+{{- $volumes := .volumes -}}
+{{- $javaOpts := .javaOpts | default "-Xms512m -Xmx1g" -}}
+{{- $profile := $root.Values.global.environment | default "dev" -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -41,7 +48,7 @@ spec:
       containers:
         - name: {{ $serviceName }}
           image: {{ printf "%s:%s" $image.repository $image.tag | quote }}
-          imagePullPolicy: {{ $image.pullPolicy | default "IfNotPresent" }}
+          imagePullPolicy: {{ $imagePullPolicy }}
           ports:
             - name: http
               containerPort: {{ $port }}
@@ -60,13 +67,34 @@ spec:
           {{- end }}
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: {{ $root.Values.global.environment }}
+              value: {{ $profile }}
+            - name: JAVA_OPTS
+              value: {{ $javaOpts }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             {{- range $env }}
             - {{ . | toYaml | nindent 14 }}
             {{- end }}
+          {{- if or $configMap $secretName }}
+          envFrom:
+            {{- if $configMap }}
+            - configMapRef:
+                name: {{ $serviceName }}-config
+            {{- end }}
+            {{- if $secretName }}
+            - secretRef:
+                name: {{ $secretName }}
+            {{- end }}
+          {{- end }}
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/liveness
               port: http
             initialDelaySeconds: 60
             periodSeconds: 10
@@ -74,7 +102,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/readiness
               port: http
             initialDelaySeconds: 30
             periodSeconds: 5
@@ -82,6 +110,46 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml $resources | nindent 12 }}
+          volumeMounts:
+          {{- if $configMap }}
+            - name: config
+              mountPath: /config
+          {{- end }}
+          {{- if $configMapVolume }}
+            {{- range $configMapVolume }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              readOnly: {{ .readOnly | default false }}
+            {{- end }}
+          {{- end }}
+          {{- if $volumes }}
+            {{- range $volumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+          {{- end }}
+      {{- if or $configMap $volumes }}
+      volumes:
+      {{- if $configMap }}
+        - name: config
+          configMap:
+            name: {{ $serviceName }}-config
+      {{- end }}
+      {{- if $configMapVolume }}
+        {{- range $configMapVolume }}
+        - name: {{ .name }}
+          configMap:
+            name: {{ .configMapName }}
+        {{- end }}
+      {{- end }}
+      {{- if $volumes }}
+        {{- range $volumes }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .claimName }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
       {{- with $root.Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}

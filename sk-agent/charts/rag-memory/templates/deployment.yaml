@@ -1,1 +1,9 @@
-{{ include "java.deployment" (dict "root" . "serviceName" .Values.name "image" .Values.image "port" .Values.service.port "resources" .Values.resources "replicas" 1 "serviceType" .Values.service.type) }}
+{{ include "statefulset" (dict 
+  "root" . 
+  "name" .Values.name
+  "image" .Values.image 
+  "port" .Values.service.port 
+  "volumes" .Values.volumes
+  "env" .Values.env
+  "resources" .Values.resources
+) }}

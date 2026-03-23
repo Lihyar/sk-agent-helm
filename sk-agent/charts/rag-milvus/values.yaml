@@ -2,11 +2,19 @@ name: milvus
 image:
   repository: milvusdb/milvus
   tag: v2.3.3
-persistence:
-  size: 10Gi
-  storageClass: manual-sc
+  pullPolicy: IfNotPresent
 service:
   port: 19530
+env:
+  - name: ETCD_ENDPOINTS
+    value: "milvus-etcd:2379"
+  - name: MINIO_ADDRESS
+    value: "milvus-minio:9000"
+volumes:
+  - name: data
+    mountPath: /var/lib/milvus
+    size: 10Gi
+    storageClass: manual-sc
 resources:
   requests:
     cpu: 1000m

@@ -1,22 +1,33 @@
 {{/*
-StatefulSet Template with PVC
-Usage: include "statefulset" (dict "root" . "name" "serviceName" "image" "port" "resources" "persistence" ...)
+StatefulSet Template with Multiple PVC Support
+Usage: include "statefulset" (dict "root" . "name" "image" "volumes" "resources" ...)
+Example volumes:
+  - name: data
+    mountPath: /var/lib/mysql
+    size: 10Gi
+    storageClass: standard
+  - name: config
+    mountPath: /etc/mysql/conf.d
+    size: 1Gi
+    storageClass: standard
 */}}
 {{- define "statefulset" -}}
 {{- $root := .root -}}
 {{- $name := .name -}}
 {{- $serviceName := .serviceName | default $name -}}
 {{- $image := .image | default (dict "repository" "nginx" "tag" "latest") -}}
+{{- $imagePullPolicy := .imagePullPolicy | default "IfNotPresent" -}}
 {{- $port := .port | default 8080 -}}
 {{- $resources := .resources | default (dict "requests" (dict "cpu" "250m" "memory" "512Mi") "limits" (dict "cpu" "1000m" "memory" "2Gi")) -}}
-{{- $persistence := .persistence | default (dict "enabled" true "size" "2Gi" "storageClass" "manual-sc") -}}
+{{- $volumes := .volumes | default (list (dict "name" "data" "mountPath" "/data" "size" "2Gi" "storageClass" "manual-sc")) -}}
 {{- $serviceType := .serviceType | default "ClusterIP" -}}
 {{- $headless := .headless | default false -}}
 {{- $env := .env | default list -}}
-{{- $command := .command | default nil -}}
-{{- $args := .args | default nil -}}
-{{- $configmapName := .configmapName | default nil -}}
-{{- $secretName := .secretName | default nil -}}
+{{- $command := .command -}}
+{{- $args := .args -}}
+{{- $initCommand := .initCommand -}}
+{{- $configmapName := .configmapName -}}
+{{- $secretName := .secretName -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -40,6 +51,7 @@ spec:
       serviceAccountName: {{ include "sk-agent.serviceAccountName" $root }}
       securityContext:
         {{- toYaml $root.Values.securityContext | nindent 8 }}
+      {{- if $initCommand }}
       initContainers:
         - name: init-permissions
           image: "busybox:1.36"
@@ -47,14 +59,17 @@ spec:
             - sh
             - -c
             - |
-              mkdir -p /data && chown -R 1000:1000 /data
+              {{ $initCommand }}
           volumeMounts:
-            - name: data
-              mountPath: /data
+          {{- range $volumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+          {{- end }}
+      {{- end }}
       containers:
         - name: {{ $name }}
           image: {{ printf "%s:%s" $image.repository $image.tag | quote }}
-          imagePullPolicy: {{ $image.pullPolicy | default "IfNotPresent" }}
+          imagePullPolicy: {{ $imagePullPolicy }}
           ports:
             - name: http
               containerPort: {{ $port }}
@@ -72,9 +87,28 @@ spec:
             {{- end }}
           {{- end }}
           env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             {{- range $env }}
             - {{ . | toYaml | nindent 14 }}
             {{- end }}
+          {{- if or $configmapName $secretName }}
+          envFrom:
+            {{- if $configmapName }}
+            - configMapRef:
+                name: {{ $configmapName }}
+            {{- end }}
+            {{- if $secretName }}
+            - secretRef:
+                name: {{ $secretName }}
+            {{- end }}
+          {{- end }}
           livenessProbe:
             tcpSocket:
               port: http
@@ -92,8 +126,10 @@ spec:
           resources:
             {{- toYaml $resources | nindent 12 }}
           volumeMounts:
-            - name: data
-              mountPath: /data
+          {{- range $volumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+          {{- end }}
       {{- with $root.Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
@@ -102,17 +138,19 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-  {{- if and $persistence.enabled $persistence.size }}
+  {{- if $volumes }}
   volumeClaimTemplates:
+  {{- range $volumes }}
     - metadata:
-        name: data
+        name: {{ .name }}
       spec:
         accessModes:
-          - ReadWriteOnce
-        storageClassName: {{ $persistence.storageClass | default "manual-sc" }}
+          - {{ .accessMode | default "ReadWriteOnce" }}
+        storageClassName: {{ .storageClass | default "manual-sc" }}
         resources:
           requests:
-            storage: {{ $persistence.size }}
+            storage: {{ .size }}
+  {{- end }}
   {{- end }}
 ---
 {{- if $headless }}
