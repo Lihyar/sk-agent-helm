@@ -1,2 +1,0 @@
-{{ include "java.configmap" (dict "root" . "serviceName" .Values.name "applicationYaml" .Values.config) }}
-{{ include "java.deployment" (dict "root" . "serviceName" .Values.name "image" .Values.image "port" .Values.service.port "resources" .Values.resources "replicas" .Values.replicas "serviceType" .Values.service.type "configMap" true) }}

@@ -1,581 +1,5 @@
 ---
-# Source: sk-agent/charts/infra-minio/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: minio
-  labels:
-    helm.sh/chart: infra-minio-0.1.0
-    app.kubernetes.io/name: infra-minio
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 9000
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: minio
----
-# Source: sk-agent/charts/infra-mysql/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: mysql
-  labels:
-    helm.sh/chart: infra-mysql-0.1.0
-    app.kubernetes.io/name: infra-mysql
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 3306
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: mysql
----
-# Source: sk-agent/charts/infra-rabbitmq/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: rabbitmq
-  labels:
-    helm.sh/chart: infra-rabbitmq-0.1.0
-    app.kubernetes.io/name: infra-rabbitmq
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 5672
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: rabbitmq
----
-# Source: sk-agent/charts/infra-redis/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: redis
-  labels:
-    helm.sh/chart: infra-redis-0.1.0
-    app.kubernetes.io/name: infra-redis
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 6379
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: redis
----
-# Source: sk-agent/charts/rag-memory/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: memory
-  labels:
-    helm.sh/chart: rag-memory-0.1.0
-    app.kubernetes.io/name: rag-memory
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: memory
----
-# Source: sk-agent/charts/rag-milvus/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: milvus
-  labels:
-    helm.sh/chart: rag-milvus-0.1.0
-    app.kubernetes.io/name: rag-milvus
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 19530
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: milvus
----
-# Source: sk-agent/charts/rag-services/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: rag-services
-  labels:
-    helm.sh/chart: rag-services-0.1.0
-    app.kubernetes.io/name: rag-services
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: rag-services
----
-# Source: sk-agent/charts/svc-agent/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: agent
-  labels:
-    helm.sh/chart: svc-agent-0.1.0
-    app.kubernetes.io/name: svc-agent
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: agent
----
-# Source: sk-agent/charts/svc-assessment/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: assessment
-  labels:
-    helm.sh/chart: svc-assessment-0.1.0
-    app.kubernetes.io/name: svc-assessment
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: assessment
----
-# Source: sk-agent/charts/svc-customer/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: customer
-  labels:
-    helm.sh/chart: svc-customer-0.1.0
-    app.kubernetes.io/name: svc-customer
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: customer
----
-# Source: sk-agent/charts/svc-dashboard/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: dashboard
-  labels:
-    helm.sh/chart: svc-dashboard-0.1.0
-    app.kubernetes.io/name: svc-dashboard
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: dashboard
----
-# Source: sk-agent/charts/svc-domain/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: domain
-  labels:
-    helm.sh/chart: svc-domain-0.1.0
-    app.kubernetes.io/name: svc-domain
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: domain
----
-# Source: sk-agent/charts/svc-etl/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: etl
-  labels:
-    helm.sh/chart: svc-etl-0.1.0
-    app.kubernetes.io/name: svc-etl
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: etl
----
-# Source: sk-agent/charts/svc-hospital/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: hospital
-  labels:
-    helm.sh/chart: svc-hospital-0.1.0
-    app.kubernetes.io/name: svc-hospital
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: hospital
----
-# Source: sk-agent/charts/svc-manager/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: manager
-  labels:
-    helm.sh/chart: svc-manager-0.1.0
-    app.kubernetes.io/name: svc-manager
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: manager
----
-# Source: sk-agent/charts/svc-notification/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: notification
-  labels:
-    helm.sh/chart: svc-notification-0.1.0
-    app.kubernetes.io/name: svc-notification
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: notification
----
-# Source: sk-agent/charts/svc-operation/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: operation
-  labels:
-    helm.sh/chart: svc-operation-0.1.0
-    app.kubernetes.io/name: svc-operation
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: operation
----
-# Source: sk-agent/charts/svc-scheduler/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: scheduler
-  labels:
-    helm.sh/chart: svc-scheduler-0.1.0
-    app.kubernetes.io/name: svc-scheduler
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: scheduler
----
-# Source: sk-agent/charts/svc-storage/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: storage
-  labels:
-    helm.sh/chart: svc-storage-0.1.0
-    app.kubernetes.io/name: svc-storage
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: storage
----
-# Source: sk-agent/charts/svc-tcm/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: tcm
-  labels:
-    helm.sh/chart: svc-tcm-0.1.0
-    app.kubernetes.io/name: svc-tcm
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: tcm
----
-# Source: sk-agent/charts/svc-user/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: user
-  labels:
-    helm.sh/chart: svc-user-0.1.0
-    app.kubernetes.io/name: svc-user
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: user
----
-# Source: sk-agent/charts/web-app/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: app-web
-  labels:
-    helm.sh/chart: web-app-0.1.0
-    app.kubernetes.io/name: web-app
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 3000
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: app-web
----
-# Source: sk-agent/charts/web-hospital/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: hospital-web
-  labels:
-    helm.sh/chart: web-hospital-0.1.0
-    app.kubernetes.io/name: web-hospital
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-spec:
-  type: ClusterIP
-  ports:
-    - port: 3000
-      targetPort: http
-      protocol: TCP
-      name: http
-  selector:
-    app: hospital-web
----
-# Source: sk-agent/charts/web-nginx/templates/deployment.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx
-spec:
-  type: LoadBalancer
-  ports:
-  - port: 80
-    targetPort: 80
-  selector:
-    app: nginx
----
-# Source: sk-agent/charts/rag-services/templates/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: rag-services
-  labels:
-    helm.sh/chart: rag-services-0.1.0
-    app.kubernetes.io/name: rag-services
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-    layer: platform-services
-    language: java
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: rag-services
-      app.kubernetes.io/instance: release-name
-      app: rag-services
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: rag-services
-        app.kubernetes.io/instance: release-name
-        app: rag-services
-        layer: platform-services
-    spec:
-      
-      imagePullSecrets:
-        - name: registry-secret
-      serviceAccountName: sk-agent-account
-      securityContext:
-        null
-      containers:
-        - name: rag-services
-          image: "registry.example.com/sk-agent/rag-services:latest"
-          imagePullPolicy: IfNotPresent
-          ports:
-            - name: http
-              containerPort: 8080
-              protocol: TCP
-          env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: dev
-            - name: JAVA_OPTS
-              value: -Xms512m -Xmx1g
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          livenessProbe:
-            httpGet:
-              path: /actuator/health/liveness
-              port: http
-            initialDelaySeconds: 60
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              path: /actuator/health/readiness
-              port: http
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            timeoutSeconds: 3
-            failureThreshold: 3
-          resources:
-            limits:
-              cpu: 2000m
-              memory: 4Gi
-            requests:
-              cpu: 500m
-              memory: 1Gi
-          volumeMounts:
----
-# Source: sk-agent/charts/svc-agent/templates/deployment.yaml
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-agent/templates/deployment.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -600,6 +24,844 @@ data:
     redis:
       host: redis
       port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-assessment/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: assessment-config
+  labels:
+    helm.sh/chart: svc-assessment-0.1.0
+    app.kubernetes.io/name: svc-assessment
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: assessment-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-customer/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: customer-config
+  labels:
+    helm.sh/chart: svc-customer-0.1.0
+    app.kubernetes.io/name: svc-customer
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: customer-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-dashboard/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboard-config
+  labels:
+    helm.sh/chart: svc-dashboard-0.1.0
+    app.kubernetes.io/name: svc-dashboard
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: dashboard-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-domain/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: domain-config
+  labels:
+    helm.sh/chart: svc-domain-0.1.0
+    app.kubernetes.io/name: svc-domain
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: domain-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-etl/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: etl-config
+  labels:
+    helm.sh/chart: svc-etl-0.1.0
+    app.kubernetes.io/name: svc-etl
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    mysql:
+      database: skagent
+      host: mysql
+      port: 3306
+    rabbitmq:
+      host: rabbitmq
+      port: 5672
+    redis:
+      host: redis
+      port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-hospital/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hospital-config
+  labels:
+    helm.sh/chart: svc-hospital-0.1.0
+    app.kubernetes.io/name: svc-hospital
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: hospital-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-manager/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: manager-config
+  labels:
+    helm.sh/chart: svc-manager-0.1.0
+    app.kubernetes.io/name: svc-manager
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: manager-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-notification/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-config
+  labels:
+    helm.sh/chart: svc-notification-0.1.0
+    app.kubernetes.io/name: svc-notification
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: notification-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-operation/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: operation-config
+  labels:
+    helm.sh/chart: svc-operation-0.1.0
+    app.kubernetes.io/name: svc-operation
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: operation-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-scheduler/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scheduler-config
+  labels:
+    helm.sh/chart: svc-scheduler-0.1.0
+    app.kubernetes.io/name: svc-scheduler
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: scheduler-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-storage/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: storage-config
+  labels:
+    helm.sh/chart: svc-storage-0.1.0
+    app.kubernetes.io/name: svc-storage
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: storage-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-tcm/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcm-config
+  labels:
+    helm.sh/chart: svc-tcm-0.1.0
+    app.kubernetes.io/name: svc-tcm
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: tcm-service
+      datasource:
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent
+        username: skuser
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-user/templates/deployment.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-config
+  labels:
+    helm.sh/chart: svc-user-0.1.0
+    app.kubernetes.io/name: svc-user
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  application.yaml: |
+    server:
+      port: 8080
+    spring:
+      application:
+        name: user-service
+      datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: mysql123
+        url: jdbc:mysql://mysql:3306/skagent?useUnicode=true&characterEncoding=utf8&useSSL=false
+        username: skuser
+      rabbitmq:
+        host: rabbitmq
+        port: 5672
+      redis:
+        host: redis
+        port: 6379
+---
+# Source: sk-agent/charts/sk-agent-middleware/charts/infra-minio/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  labels:
+    helm.sh/chart: infra-minio-0.1.0
+    app.kubernetes.io/name: infra-minio
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: minio
+---
+# Source: sk-agent/charts/sk-agent-middleware/charts/infra-mysql/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    helm.sh/chart: infra-mysql-0.1.0
+    app.kubernetes.io/name: infra-mysql
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: mysql
+---
+# Source: sk-agent/charts/sk-agent-middleware/charts/infra-rabbitmq/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    helm.sh/chart: infra-rabbitmq-0.1.0
+    app.kubernetes.io/name: infra-rabbitmq
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5672
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: rabbitmq
+---
+# Source: sk-agent/charts/sk-agent-middleware/charts/infra-redis/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    helm.sh/chart: infra-redis-0.1.0
+    app.kubernetes.io/name: infra-redis
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: redis
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-agent/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent
+  labels:
+    helm.sh/chart: svc-agent-0.1.0
+    app.kubernetes.io/name: svc-agent
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: agent
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-assessment/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: assessment
+  labels:
+    helm.sh/chart: svc-assessment-0.1.0
+    app.kubernetes.io/name: svc-assessment
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: assessment
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-customer/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: customer
+  labels:
+    helm.sh/chart: svc-customer-0.1.0
+    app.kubernetes.io/name: svc-customer
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: customer
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-dashboard/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashboard
+  labels:
+    helm.sh/chart: svc-dashboard-0.1.0
+    app.kubernetes.io/name: svc-dashboard
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: dashboard
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-domain/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: domain
+  labels:
+    helm.sh/chart: svc-domain-0.1.0
+    app.kubernetes.io/name: svc-domain
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: domain
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-etl/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: etl
+  labels:
+    helm.sh/chart: svc-etl-0.1.0
+    app.kubernetes.io/name: svc-etl
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: etl
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-hospital/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: hospital
+  labels:
+    helm.sh/chart: svc-hospital-0.1.0
+    app.kubernetes.io/name: svc-hospital
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: hospital
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-manager/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: manager
+  labels:
+    helm.sh/chart: svc-manager-0.1.0
+    app.kubernetes.io/name: svc-manager
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: manager
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-notification/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification
+  labels:
+    helm.sh/chart: svc-notification-0.1.0
+    app.kubernetes.io/name: svc-notification
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: notification
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-operation/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: operation
+  labels:
+    helm.sh/chart: svc-operation-0.1.0
+    app.kubernetes.io/name: svc-operation
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: operation
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-scheduler/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: scheduler
+  labels:
+    helm.sh/chart: svc-scheduler-0.1.0
+    app.kubernetes.io/name: svc-scheduler
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: scheduler
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-storage/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: storage
+  labels:
+    helm.sh/chart: svc-storage-0.1.0
+    app.kubernetes.io/name: svc-storage
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: storage
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-tcm/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcm
+  labels:
+    helm.sh/chart: svc-tcm-0.1.0
+    app.kubernetes.io/name: svc-tcm
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: tcm
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-user/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+  labels:
+    helm.sh/chart: svc-user-0.1.0
+    app.kubernetes.io/name: svc-user
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: user
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/web-app/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-web
+  labels:
+    helm.sh/chart: web-app-0.1.0
+    app.kubernetes.io/name: web-app
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: app-web
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/web-hospital/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: hospital-web
+  labels:
+    helm.sh/chart: web-hospital-0.1.0
+    app.kubernetes.io/name: web-hospital
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: hospital-web
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/web-nginx/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: nginx
+---
+# Source: sk-agent/charts/sk-agent-rag/charts/rag-memory/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: memory
+  labels:
+    helm.sh/chart: rag-memory-0.1.0
+    app.kubernetes.io/name: rag-memory
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: memory
+---
+# Source: sk-agent/charts/sk-agent-rag/charts/rag-milvus/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: milvus
+  labels:
+    helm.sh/chart: rag-milvus-0.1.0
+    app.kubernetes.io/name: rag-milvus
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 19530
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: milvus
+---
+# Source: sk-agent/charts/sk-agent-rag/charts/rag-services/templates/deployment.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-services
+  labels:
+    helm.sh/chart: rag-services-0.1.0
+    app.kubernetes.io/name: rag-services
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: rag-services
+---
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-agent/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -688,31 +950,7 @@ spec:
           configMap:
             name: agent-config
 ---
-# Source: sk-agent/charts/svc-assessment/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: assessment-config
-  labels:
-    helm.sh/chart: svc-assessment-0.1.0
-    app.kubernetes.io/name: svc-assessment
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: assessment-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-assessment/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -801,31 +1039,7 @@ spec:
           configMap:
             name: assessment-config
 ---
-# Source: sk-agent/charts/svc-customer/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: customer-config
-  labels:
-    helm.sh/chart: svc-customer-0.1.0
-    app.kubernetes.io/name: svc-customer
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: customer-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-customer/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -914,31 +1128,7 @@ spec:
           configMap:
             name: customer-config
 ---
-# Source: sk-agent/charts/svc-dashboard/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: dashboard-config
-  labels:
-    helm.sh/chart: svc-dashboard-0.1.0
-    app.kubernetes.io/name: svc-dashboard
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: dashboard-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-dashboard/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1027,31 +1217,7 @@ spec:
           configMap:
             name: dashboard-config
 ---
-# Source: sk-agent/charts/svc-domain/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: domain-config
-  labels:
-    helm.sh/chart: svc-domain-0.1.0
-    app.kubernetes.io/name: svc-domain
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: domain-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-domain/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1140,29 +1306,7 @@ spec:
           configMap:
             name: domain-config
 ---
-# Source: sk-agent/charts/svc-etl/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: etl-config
-  labels:
-    helm.sh/chart: svc-etl-0.1.0
-    app.kubernetes.io/name: svc-etl
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    mysql:
-      database: skagent
-      host: mysql
-      port: 3306
-    rabbitmq:
-      host: rabbitmq
-      port: 5672
-    redis:
-      host: redis
-      port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-etl/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1251,31 +1395,7 @@ spec:
           configMap:
             name: etl-config
 ---
-# Source: sk-agent/charts/svc-hospital/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: hospital-config
-  labels:
-    helm.sh/chart: svc-hospital-0.1.0
-    app.kubernetes.io/name: svc-hospital
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: hospital-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-hospital/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1364,31 +1484,7 @@ spec:
           configMap:
             name: hospital-config
 ---
-# Source: sk-agent/charts/svc-manager/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: manager-config
-  labels:
-    helm.sh/chart: svc-manager-0.1.0
-    app.kubernetes.io/name: svc-manager
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: manager-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-manager/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1477,31 +1573,7 @@ spec:
           configMap:
             name: manager-config
 ---
-# Source: sk-agent/charts/svc-notification/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: notification-config
-  labels:
-    helm.sh/chart: svc-notification-0.1.0
-    app.kubernetes.io/name: svc-notification
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: notification-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-notification/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1590,31 +1662,7 @@ spec:
           configMap:
             name: notification-config
 ---
-# Source: sk-agent/charts/svc-operation/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: operation-config
-  labels:
-    helm.sh/chart: svc-operation-0.1.0
-    app.kubernetes.io/name: svc-operation
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: operation-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-operation/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1703,31 +1751,7 @@ spec:
           configMap:
             name: operation-config
 ---
-# Source: sk-agent/charts/svc-scheduler/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: scheduler-config
-  labels:
-    helm.sh/chart: svc-scheduler-0.1.0
-    app.kubernetes.io/name: svc-scheduler
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: scheduler-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-scheduler/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1816,31 +1840,7 @@ spec:
           configMap:
             name: scheduler-config
 ---
-# Source: sk-agent/charts/svc-storage/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: storage-config
-  labels:
-    helm.sh/chart: svc-storage-0.1.0
-    app.kubernetes.io/name: svc-storage
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: storage-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-storage/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1929,31 +1929,7 @@ spec:
           configMap:
             name: storage-config
 ---
-# Source: sk-agent/charts/svc-tcm/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: tcm-config
-  labels:
-    helm.sh/chart: svc-tcm-0.1.0
-    app.kubernetes.io/name: svc-tcm
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: tcm-service
-      datasource:
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent
-        username: skuser
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-tcm/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -2042,35 +2018,7 @@ spec:
           configMap:
             name: tcm-config
 ---
-# Source: sk-agent/charts/svc-user/templates/deployment.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: user-config
-  labels:
-    helm.sh/chart: svc-user-0.1.0
-    app.kubernetes.io/name: svc-user
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.0.0"
-    app.kubernetes.io/managed-by: Helm
-data:
-  application.yaml: |
-    server:
-      port: 8080
-    spring:
-      application:
-        name: user-service
-      datasource:
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        password: mysql123
-        url: jdbc:mysql://mysql:3306/skagent?useUnicode=true&characterEncoding=utf8&useSSL=false
-        username: skuser
-      rabbitmq:
-        host: rabbitmq
-        port: 5672
-      redis:
-        host: redis
-        port: 6379
+# Source: sk-agent/charts/sk-agent-platform/charts/svc-user/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -2159,7 +2107,7 @@ spec:
           configMap:
             name: user-config
 ---
-# Source: sk-agent/charts/web-app/templates/deployment.yaml
+# Source: sk-agent/charts/sk-agent-platform/charts/web-app/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -2228,7 +2176,7 @@ spec:
               cpu: 100m
               memory: 128Mi
 ---
-# Source: sk-agent/charts/web-hospital/templates/deployment.yaml
+# Source: sk-agent/charts/sk-agent-platform/charts/web-hospital/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -2297,7 +2245,7 @@ spec:
               cpu: 100m
               memory: 128Mi
 ---
-# Source: sk-agent/charts/web-nginx/templates/deployment.yaml
+# Source: sk-agent/charts/sk-agent-platform/charts/web-nginx/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -2325,7 +2273,87 @@ spec:
         ports:
         - containerPort: 80
 ---
-# Source: sk-agent/charts/infra-minio/templates/deployment.yaml
+# Source: sk-agent/charts/sk-agent-rag/charts/rag-services/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-services
+  labels:
+    helm.sh/chart: rag-services-0.1.0
+    app.kubernetes.io/name: rag-services
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+    layer: platform-services
+    language: java
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rag-services
+      app.kubernetes.io/instance: release-name
+      app: rag-services
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rag-services
+        app.kubernetes.io/instance: release-name
+        app: rag-services
+        layer: platform-services
+    spec:
+      
+      imagePullSecrets:
+        - name: registry-secret
+      serviceAccountName: sk-agent-account
+      securityContext:
+        null
+      containers:
+        - name: rag-services
+          image: "registry.example.com/sk-agent/rag-services:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: dev
+            - name: JAVA_OPTS
+              value: -Xms512m -Xmx1g
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          volumeMounts:
+---
+# Source: sk-agent/charts/sk-agent-middleware/charts/infra-minio/templates/deployment.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -2415,7 +2443,7 @@ spec:
           requests:
             storage: 20Gi
 ---
-# Source: sk-agent/charts/infra-mysql/templates/deployment.yaml
+# Source: sk-agent/charts/sk-agent-middleware/charts/infra-mysql/templates/deployment.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -2516,7 +2544,7 @@ spec:
           requests:
             storage: 1Gi
 ---
-# Source: sk-agent/charts/infra-rabbitmq/templates/deployment.yaml
+# Source: sk-agent/charts/sk-agent-middleware/charts/infra-rabbitmq/templates/deployment.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -2606,7 +2634,7 @@ spec:
           requests:
             storage: 8Gi
 ---
-# Source: sk-agent/charts/infra-redis/templates/deployment.yaml
+# Source: sk-agent/charts/sk-agent-middleware/charts/infra-redis/templates/deployment.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -2704,7 +2732,7 @@ spec:
           requests:
             storage: 100Mi
 ---
-# Source: sk-agent/charts/rag-memory/templates/deployment.yaml
+# Source: sk-agent/charts/sk-agent-rag/charts/rag-memory/templates/deployment.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -2788,7 +2816,7 @@ spec:
           requests:
             storage: 5Gi
 ---
-# Source: sk-agent/charts/rag-milvus/templates/deployment.yaml
+# Source: sk-agent/charts/sk-agent-rag/charts/rag-milvus/templates/deployment.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:

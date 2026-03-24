@@ -1,18 +1,24 @@
 apiVersion: v2
-name: sk-agent
-description: SK Agent Microservices Architecture - Parent Chart
+name: sk-agent-middleware
+description: SK Agent middleware Architecture - Parent Chart
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
 
 dependencies:
-  - name: sk-agent-middleware
+  - name: infra-mysql
     version: "0.1.0"
-  - name: sk-agent-rag
+    condition: infra-mysql.enabled
+  - name: infra-redis
     version: "0.1.0"
-  - name: sk-agent-platform
+    condition: infra-redis.enabled
+  - name: infra-rabbitmq
     version: "0.1.0"
-
+    condition: infra-rabbitmq.enabled
+  - name: infra-minio
+    version: "0.1.0"
+    condition: infra-minio.enabled
+  
 keywords:
   - microservices
   - sk-agent
