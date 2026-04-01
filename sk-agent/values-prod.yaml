@@ -1,9 +1,10 @@
-# Production Environment Configuration
+# Production Environment Configuration (V4)
 # Usage: helm install sk-agent-prod sk-agent -f values-prod.yaml
 
 global:
   environment: prod
   architecture: amd64
+  database: mysql
   storageClass: "standard"
   imagePullSecrets:
     - name: registry-secret
@@ -11,15 +12,17 @@ global:
     create: true
     name: "sk-agent-account"
 
-# Registry Configuration
 registry:
   enabled: true
-  server: "registry.example.com"
+  server: "saascr.shukun.net"
   username: ""
   password: ""
 
-# Infra Layer - Production settings with high resources
-infra:
+# ==============================================================================
+# L2: Middleware Layer - Production settings with high resources
+# ==============================================================================
+middleware:
+  enabled: true
   mysql:
     enabled: true
     persistence:
@@ -32,7 +35,6 @@ infra:
       limits:
         cpu: 4000m
         memory: 8Gi
-
   redis:
     enabled: true
     persistence:
@@ -45,7 +47,6 @@ infra:
       limits:
         cpu: 2000m
         memory: 4Gi
-
   rabbitmq:
     enabled: true
     persistence:
@@ -58,7 +59,6 @@ infra:
       limits:
         cpu: 2000m
         memory: 4Gi
-
   minio:
     enabled: true
     persistence:
@@ -72,8 +72,11 @@ infra:
         cpu: 2000m
         memory: 4Gi
 
-# RAG Layer
-rag:
+# ==============================================================================
+# L2: Data Service Layer - Production settings
+# ==============================================================================
+data-service:
+  enabled: true
   memory:
     enabled: true
     persistence:
@@ -82,46 +85,63 @@ rag:
     enabled: true
     persistence:
       size: 200Gi
-  ragServices:
+  rag-services:
     enabled: true
 
-# Platform Services - Production settings
-services:
+# ==============================================================================
+# L2: Model Service Layer - Production settings
+# ==============================================================================
+model-service:
+  enabled: false
+
+# ==============================================================================
+# L2: Common Service Layer - Production settings
+# ==============================================================================
+common-service:
   enabled: true
-  
-  initData:
-    enabled: true
   user:
     enabled: true
     replicas: 2
   domain:
     enabled: true
     replicas: 2
-  scheduler:
-    enabled: true
-    replicas: 2
-  agent:
-    enabled: true
-    replicas: 3
-  agentTask:
-    enabled: true
-    replicas: 2
-  operation:
+  etl:
     enabled: true
     replicas: 2
   storage:
     enabled: true
     replicas: 2
-  etl:
+  notification:
     enabled: true
     replicas: 2
-  etlListener:
+  operation:
     enabled: true
     replicas: 2
-  etlBeat:
+
+# ==============================================================================
+# L2: Medical Brain Layer - Production settings
+# ==============================================================================
+medical-brain:
+  enabled: true
+  agent:
     enabled: true
-    replicas: 1
+    replicas: 3
+  agent-task:
+    enabled: true
+    replicas: 2
+  scheduler:
+    enabled: true
+    replicas: 2
+
+# ==============================================================================
+# L2: Business Service Layer - Production settings
+# ==============================================================================
+biz-service:
+  enabled: true
   assessment:
+    enabled: true
+    replicas: 2
+  dashboard:
     enabled: true
     replicas: 2
   hospital:
@@ -130,26 +150,16 @@ services:
   tcm:
     enabled: true
     replicas: 2
-  notification:
-    enabled: true
-    replicas: 2
   customer:
     enabled: true
     replicas: 2
-  dashboard:
-    enabled: true
-    replicas: 2
-  manager:
-    enabled: true
-    replicas: 3
 
-# Web Layer - Production settings
-web:
+# ==============================================================================
+# L2: Gateway Layer - Production settings
+# ==============================================================================
+gateway:
   enabled: true
-  appWeb:
-    enabled: true
-    replicas: 3
-  hospitalWeb:
+  manager:
     enabled: true
     replicas: 3
   nginx:
@@ -157,8 +167,33 @@ web:
     replicas: 3
     service:
       type: LoadBalancer
+    ingress:
+      enabled: true
+      className: "nginx"
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+        nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+      hosts:
+        - host: sk-agent.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: sk-agent-prod-tls
+          hosts:
+            - sk-agent.example.com
+  app-web:
+    enabled: true
+    replicas: 3
+  hospital-web:
+    enabled: true
+    replicas: 3
 
-# Node selector
+# ==============================================================================
+# Global Settings
+# ==============================================================================
 nodeSelector:
   kubernetes.io/arch: "amd64"
 
@@ -176,15 +211,11 @@ affinity:
                   - nginx
           topologyKey: kubernetes.io/hostname
 
-# Ingress
 ingress:
   enabled: true
   className: "nginx"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
   hosts:
     - host: sk-agent.example.com
       paths:

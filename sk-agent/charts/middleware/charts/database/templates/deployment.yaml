@@ -1,0 +1,40 @@
+{{- if .Values.enabled }}
+{{- $dbType := .Values.database.type | lower }}
+{{- $imageConfig := dict }}
+{{- $port := 0 }}
+{{- $envList := list }}
+{{- $volumes := list }}
+{{- $resources := dict }}
+
+{{- if eq $dbType "mysql" }}
+{{- $imageConfig = .Values.mysql.image }}
+{{- $port = .Values.mysql.service.port }}
+{{- $envList = .Values.mysql.env }}
+{{- $volumes = .Values.mysql.volumes }}
+{{- $resources = .Values.mysql.resources }}
+{{- else if eq $dbType "postgresql" }}
+{{- $imageConfig = .Values.postgresql.image }}
+{{- $port = .Values.postgresql.service.port }}
+{{- $envList = .Values.postgresql.env }}
+{{- $volumes = .Values.postgresql.volumes }}
+{{- $resources = .Values.postgresql.resources }}
+{{- else if eq $dbType "kingbase" }}
+{{- $imageConfig = .Values.kingbase.image }}
+{{- $port = .Values.kingbase.service.port }}
+{{- $envList = .Values.kingbase.env }}
+{{- $volumes = .Values.kingbase.volumes }}
+{{- $resources = .Values.kingbase.resources }}
+{{- else }}
+{{- fail "Unsupported database type. Must be one of: mysql, postgresql, kingbase" }}
+{{- end }}
+
+{{ include "statefulset" (dict 
+  "root" . 
+  "name" $dbType
+  "image" $imageConfig
+  "port" $port 
+  "volumes" $volumes
+  "env" $envList
+  "resources" $resources
+) }}
+{{- end }}

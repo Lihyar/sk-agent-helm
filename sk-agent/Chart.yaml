@@ -1,17 +1,39 @@
 apiVersion: v2
 name: sk-agent
-description: SK Agent Microservices Architecture - Parent Chart
+description: SK Agent Microservices Architecture - Parent Chart (V4)
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
 
 dependencies:
-  - name: sk-agent-middleware
+  # L2: 中间件层 - 数据库、缓存、消息队列等
+  - name: middleware
     version: "0.1.0"
-  - name: sk-agent-rag
+    condition: middleware.enabled
+  # L2: 数据基座层 - 知识库服务
+  - name: data-foundation
     version: "0.1.0"
-  - name: sk-agent-platform
+    condition: data-foundation.enabled
+  # L2: 模型基座层 - AI模型服务
+  - name: model-foundation
     version: "0.1.0"
+    condition: model-foundation.enabled
+  # L2: 公共服务基座层 - 通用服务
+  - name: common-foundation
+    version: "0.1.0"
+    condition: common-foundation.enabled
+  # L2: 智能体层 - 智能体服务
+  - name: medical-brain
+    version: "0.1.0"
+    condition: medical-brain.enabled
+  # L2: 业务服务层 - GHC业务服务
+  - name: biz-foundation
+    version: "0.1.0"
+    condition: biz-foundation.enabled
+  # L2: 网关层 - 代理服务
+  - name: gateway
+    version: "0.1.0"
+    condition: gateway.enabled
 
 keywords:
   - microservices

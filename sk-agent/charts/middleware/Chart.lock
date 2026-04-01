@@ -1,0 +1,15 @@
+dependencies:
+- name: mysql
+  repository: ""
+  version: 14.0.3
+- name: redis
+  repository: ""
+  version: 0.1.0
+- name: rabbitmq
+  repository: ""
+  version: 0.1.0
+- name: minio
+  repository: ""
+  version: 0.1.0
+digest: sha256:82e39b0b61c8f1ca4398bdf0a24d8d1d3fc433aa1a4a89d41e0791b40fa7f84c
+generated: "2026-03-31T11:39:41.578299+08:00"

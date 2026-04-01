@@ -1,5 +1,0 @@
-apiVersion: v2
-name: infra-redis
-description: infra-redis Service
-version: 0.1.0
-appVersion: 1.0.0

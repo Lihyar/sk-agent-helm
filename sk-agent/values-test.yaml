@@ -5,7 +5,7 @@ web:
     enabled: true
     name: app-web
     image:
-      repository: registry.example.com/sk-agent/app-web
+      repository: saascr.shukun.net/sk-agent/app-web
       tag: "latest"
     replicas: 1
     service:
@@ -23,7 +23,7 @@ web:
     enabled: true
     name: hospital-web
     image:
-      repository: registry.example.com/sk-agent/hospital-web
+      repository: saascr.shukun.net/sk-agent/hospital-web
       tag: "latest"
     replicas: 1
     service:

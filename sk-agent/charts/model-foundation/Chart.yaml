@@ -1,0 +1,36 @@
+apiVersion: v2
+name: model-foundation
+description: Model Foundation Layer - AI Model Services
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: asr
+    version: "0.1.0"
+    condition: asr.enabled
+  - name: vllm-bge
+    version: "0.1.0"
+    condition: vllm-bge.enabled
+  - name: vllm-reranker
+    version: "0.1.0"
+    condition: vllm-reranker.enabled
+  - name: vllm-30b
+    version: "0.1.0"
+    condition: vllm-30b.enabled
+  - name: vllm-30b-lora
+    version: "0.1.0"
+    condition: vllm-30b-lora.enabled
+  - name: vllm-vl-32b
+    version: "0.1.0"
+    condition: vllm-vl-32b.enabled
+
+keywords:
+  - model-foundation
+  - sk-agent
+  - ai-model
+  - llm
+
+maintainers:
+  - name: SK Agent Team
+    email: team@example.com

@@ -1,0 +1,1 @@
+{{ include "service.deployment" (dict "root" . "serviceName" .Values.name "image" .Values.image "port" .Values.service.port "resources" .Values.resources "replicas" 1 "serviceType" .Values.service.type) }}

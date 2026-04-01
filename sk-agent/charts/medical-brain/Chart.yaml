@@ -1,0 +1,27 @@
+apiVersion: v2
+name: medical-brain
+description: Medical Brain Layer - AI Agent Services
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: agent
+    version: "0.1.0"
+    condition: agent.enabled
+  - name: agent-task
+    version: "0.1.0"
+    condition: agent-task.enabled
+  - name: scheduler
+    version: "0.1.0"
+    condition: scheduler.enabled
+
+keywords:
+  - medical-brain
+  - sk-agent
+  - agent
+  - ai-agent
+
+maintainers:
+  - name: SK Agent Team
+    email: team@example.com

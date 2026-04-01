@@ -1,0 +1,27 @@
+apiVersion: v2
+name: data-foundation
+description: Data Foundation Layer - Knowledge Base Services
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: memory
+    version: "0.1.0"
+    condition: memory.enabled
+  - name: milvus
+    version: "0.1.0"
+    condition: milvus.enabled
+  - name: rag-services
+    version: "0.1.0"
+    condition: rag-services.enabled
+
+keywords:
+  - data-foundation
+  - sk-agent
+  - knowledge-base
+  - rag
+
+maintainers:
+  - name: SK Agent Team
+    email: team@example.com

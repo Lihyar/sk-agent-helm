@@ -1,0 +1,33 @@
+apiVersion: v2
+name: biz-foundation
+description: Business Service Layer - GHC Healthcare Services
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: assessment
+    version: "0.1.0"
+    condition: assessment.enabled
+  - name: customer
+    version: "0.1.0"
+    condition: customer.enabled
+  - name: dashboard
+    version: "0.1.0"
+    condition: dashboard.enabled
+  - name: hospital
+    version: "0.1.0"
+    condition: hospital.enabled
+  - name: tcm
+    version: "0.1.0"
+    condition: tcm.enabled
+
+keywords:
+  - biz-foundation
+  - sk-agent
+  - healthcare
+  - business
+
+maintainers:
+  - name: SK Agent Team
+    email: team@example.com

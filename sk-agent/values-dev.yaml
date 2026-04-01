@@ -1,9 +1,10 @@
-# Development Environment Configuration
+# Development Environment Configuration (V4)
 # Usage: helm install sk-agent-dev sk-agent -f values-dev.yaml
 
 global:
   environment: dev
   architecture: amd64
+  database: mysql
   storageClass: "manual-sc"
   imagePullSecrets:
     - name: registry-secret
@@ -13,145 +14,160 @@ global:
 
 registry:
   enabled: true
-  server: "registry.example.com"
+  server: "saascr.shukun.net"
   username: ""
   password: ""
 
 # ==============================================================================
-# Infrastructure Layer - 开发环境覆盖配置
+# L2: Middleware Layer - 开发环境覆盖配置
 # ==============================================================================
-
-infra-mysql:
+middleware:
   enabled: true
-  persistence:
-    size: 5Gi
-    hostPath: "/tmp/volumes/mysql-dev"
-  resources:
-    requests:
-      cpu: 250m
-      memory: 512Mi
-    limits:
-      cpu: 1000m
-      memory: 2Gi
-
-infra-redis:
-  enabled: true
-  persistence:
-    size: 1Gi
-    hostPath: "/tmp/volumes/redis-dev"
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 250m
-      memory: 512Mi
-
-infra-rabbitmq:
-  enabled: true
-  persistence:
-    size: 4Gi
-    hostPath: "/tmp/volumes/rabbitmq-dev"
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 1Gi
-
-infra-minio:
-  enabled: true
-  persistence:
-    size: 10Gi
-    hostPath: "/tmp/volumes/minio-dev"
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 1Gi
-
-# ==============================================================================
-# RAG Layer - 开发环境覆盖配置
-# ==============================================================================
-
-rag-memory:
-  enabled: true
-
-rag-milvus:
-  enabled: true
-
-rag-services:
-  enabled: true
-
-# ==============================================================================
-# Platform Services Layer - 开发环境覆盖配置
-# ==============================================================================
-
-svc-user:
-  enabled: true
-svc-domain:
-  enabled: true
-svc-scheduler:
-  enabled: true
-svc-agent:
-  enabled: true
-svc-operation:
-  enabled: true
-svc-storage:
-  enabled: true
-svc-etl:
-  enabled: true
-svc-assessment:
-  enabled: true
-svc-hospital:
-  enabled: true
-svc-tcm:
-  enabled: true
-svc-notification:
-  enabled: true
-svc-customer:
-  enabled: true
-svc-dashboard:
-  enabled: true
-svc-manager:
-  enabled: true
-
-# ==============================================================================
-# Web Layer - 开发环境覆盖配置
-# ==============================================================================
-
-web-app:
-  enabled: true
-  replicas: 1
-
-web-hospital:
-  enabled: true
-  replicas: 1
-
-web-nginx:
-  enabled: true
-  replicas: 1
-  service:
-    type: NodePort
-  ingress:
+  mysql:
     enabled: true
-    className: "nginx"
-    annotations:
-      nginx.ingress.kubernetes.io/rewrite-target: /
-    hosts:
-      - host: sk-agent-dev.local
-        paths:
-          - path: /
-            pathType: Prefix
-    tls: []
+    persistence:
+      size: 5Gi
+      hostPath: "/tmp/volumes/mysql-dev"
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+  redis:
+    enabled: true
+    persistence:
+      size: 1Gi
+      hostPath: "/tmp/volumes/redis-dev"
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 250m
+        memory: 512Mi
+  rabbitmq:
+    enabled: true
+    persistence:
+      size: 4Gi
+      hostPath: "/tmp/volumes/rabbitmq-dev"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+  minio:
+    enabled: true
+    persistence:
+      size: 10Gi
+      hostPath: "/tmp/volumes/minio-dev"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
 
 # ==============================================================================
-# Ingress Configuration
+# L2: Data Service Layer - 开发环境覆盖配置
 # ==============================================================================
+data-service:
+  enabled: true
+  memory:
+    enabled: true
+  milvus:
+    enabled: true
+  rag-services:
+    enabled: true
 
+# ==============================================================================
+# L2: Model Service Layer - 开发环境覆盖配置
+# ==============================================================================
+model-service:
+  enabled: false
+
+# ==============================================================================
+# L2: Common Service Layer - 开发环境覆盖配置
+# ==============================================================================
+common-service:
+  enabled: true
+  user:
+    enabled: true
+  domain:
+    enabled: true
+  etl:
+    enabled: true
+  storage:
+    enabled: true
+  notification:
+    enabled: true
+  operation:
+    enabled: true
+
+# ==============================================================================
+# L2: Medical Brain Layer - 开发环境覆盖配置
+# ==============================================================================
+medical-brain:
+  enabled: true
+  agent:
+    enabled: true
+  agent-task:
+    enabled: true
+  scheduler:
+    enabled: true
+
+# ==============================================================================
+# L2: Business Service Layer - 开发环境覆盖配置
+# ==============================================================================
+biz-service:
+  enabled: true
+  assessment:
+    enabled: true
+  dashboard:
+    enabled: true
+  hospital:
+    enabled: true
+  tcm:
+    enabled: true
+  customer:
+    enabled: true
+
+# ==============================================================================
+# L2: Gateway Layer - 开发环境覆盖配置
+# ==============================================================================
+gateway:
+  enabled: true
+  manager:
+    enabled: true
+  nginx:
+    enabled: true
+    service:
+      type: NodePort
+    ingress:
+      enabled: true
+      className: "nginx"
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      hosts:
+        - host: sk-agent-dev.local
+          paths:
+            - path: /
+              pathType: Prefix
+      tls: []
+  app-web:
+    enabled: true
+    replicas: 1
+  hospital-web:
+    enabled: true
+    replicas: 1
+
+# ==============================================================================
+# Global Ingress Configuration
+# ==============================================================================
 ingress:
   enabled: true
   className: "nginx"

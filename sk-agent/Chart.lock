@@ -1,75 +1,24 @@
 dependencies:
-- name: infra-mysql
+- name: middleware
   repository: ""
   version: 0.1.0
-- name: infra-redis
+- name: data-foundation
   repository: ""
   version: 0.1.0
-- name: infra-rabbitmq
+- name: model-foundation
   repository: ""
   version: 0.1.0
-- name: infra-minio
+- name: common-foundation
   repository: ""
   version: 0.1.0
-- name: rag-memory
+- name: medical-brain
   repository: ""
   version: 0.1.0
-- name: rag-milvus
+- name: biz-foundation
   repository: ""
   version: 0.1.0
-- name: rag-services
+- name: gateway
   repository: ""
   version: 0.1.0
-- name: svc-user
-  repository: ""
-  version: 0.1.0
-- name: svc-domain
-  repository: ""
-  version: 0.1.0
-- name: svc-scheduler
-  repository: ""
-  version: 0.1.0
-- name: svc-agent
-  repository: ""
-  version: 0.1.0
-- name: svc-operation
-  repository: ""
-  version: 0.1.0
-- name: svc-storage
-  repository: ""
-  version: 0.1.0
-- name: svc-etl
-  repository: ""
-  version: 0.1.0
-- name: svc-assessment
-  repository: ""
-  version: 0.1.0
-- name: svc-hospital
-  repository: ""
-  version: 0.1.0
-- name: svc-tcm
-  repository: ""
-  version: 0.1.0
-- name: svc-notification
-  repository: ""
-  version: 0.1.0
-- name: svc-customer
-  repository: ""
-  version: 0.1.0
-- name: svc-dashboard
-  repository: ""
-  version: 0.1.0
-- name: svc-manager
-  repository: ""
-  version: 0.1.0
-- name: web-app
-  repository: ""
-  version: 0.1.0
-- name: web-hospital
-  repository: ""
-  version: 0.1.0
-- name: web-nginx
-  repository: ""
-  version: 0.1.0
-digest: sha256:c82d3d61218f1bf7354a69200a9102cb8e1edb17ca0463702b5d7942372ec578
-generated: "2026-03-23T16:36:19.591398+08:00"
+digest: sha256:353d576419a853a0e1991eb823f3af7be75dda50f7ddf4b1d9c4345daa7de722
+generated: "2026-03-31T11:26:09.859447+08:00"

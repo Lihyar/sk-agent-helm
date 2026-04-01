@@ -1,0 +1,30 @@
+apiVersion: v2
+name: gateway
+description: Gateway Layer - API Gateway and Management
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: manager
+    version: "0.1.0"
+    condition: manager.enabled
+  - name: nginx
+    version: "0.1.0"
+    condition: nginx.enabled
+  - name: app-web
+    version: "0.1.0"
+    condition: app-web.enabled
+  - name: hospital-web
+    version: "0.1.0"
+    condition: hospital-web.enabled
+
+keywords:
+  - gateway
+  - sk-agent
+  - nginx
+  - management
+
+maintainers:
+  - name: SK Agent Team
+    email: team@example.com
