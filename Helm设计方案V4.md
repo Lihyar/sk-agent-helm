@@ -2,185 +2,188 @@
 
 ## 一、设计背景
 
-基于需求文档，本方案为包含Infra层、RAG层、Platform Services层和Platform Web层的微服务产品设计Helm Chart部署方案。
-
-### 需求要点
-- 使用 Helm Chart 进行应用部署和管理
-- 采用父子 Chart 结构，父 Chart 管理整体部署，**3个业务层子Chart**管理具体服务
-- 根据服务特性选择合适的 K8s 资源类型（Deployment、StatefulSet、Job）
-- **多路径持久化存储** - 支持单个服务挂载多个PVC
-- **ConfigMap配置管理** - Java服务通过ConfigMap管理application.yaml
-- 私有镜像 + ServiceAccount 账号管理
-- Ingress域名访问配置
-- 前后端服务使用可复用模板
-- 支持单机 k3s 部署，分为 dev/pre/prod 三种环境
-- 支持 x86_64、arm64 多架构部署
-- **x86架构下使用MySQL，arm64架构下使用Kingbase**
+基于需求文档，本方案为包含中间件层(middleware)、数据基座层(data)、模型基座层(model)、公共服务基座层（common）、智能体(agent)层、业务服务层(biz) 和 网关层（gateway）产品设计Helm Chart部署方案。
 
 ---
 
 ## 二、设计原则
 
-### 折中方案：业务层分组子Chart + 公共模板 + 多路径存储 + ConfigMap配置
-
-| 特点 | 第一版 | 第二版 | 第三版 | 第四版(本) |
-|------|--------|--------|--------|------------|
-| 结构 | 真正子Chart | 扁平化(无子Chart) | 24个独立子Chart | **3个业务层子Chart** |
-| 模板 | 子Chart内模板 | 全局公共模板 | 全局公共模板 | 全局公共模板 |
-| 存储 | 单路径持久化 | 无 | 多路径持久化 | 多路径持久化 |
-| 配置 | 硬编码 | 硬编码 | ConfigMap管理 | ConfigMap管理 |
-| Ingress | 无 | 无 | 支持 | 支持 |
-| 多架构 | 无 | 无 | 无 | **支持(x86/arm64)** |
-
-### 第四版新特性
-1. **业务层分组** - 3个子Chart（infra、rag、platform）按业务领域划分
-2. **多架构支持** - x86使用MySQL，arm64使用Kingbase
-3. **多路径持久化** - StatefulSet支持挂载多个PVC
-4. **ConfigMap配置管理** - Java服务自动生成ConfigMap
+### 特性
+1. **业务层分组** - 子Chart按业务领域划分
+2. **多架构支持** - x86｜arm64
+3. **多路径持久化** - 支持挂载多个PVC
+4. **ConfigMap配置管理** -服务自动生成ConfigMap
 5. **Ingress域名访问** - nginx支持Ingress配置
 6. **模板统一复用** - 公共模板在父Chart中定义，子Chart通过include调用
+7. **中间件尽量使用开源chart** - 尽量使用开源chart，个性化需求可提供设计方案
+8. **数据库** - 按需选择不同数据库。如mysql、Postgres、kingbase。优先保障mysql，其他数据库之后再实现。
+9. **持久化** -  StorageClass + HostPath + PV
+10. **全局配置初始化** - 例如私有镜像仓库授权配置、用户配置
+
 
 ---
 
 ## 三、架构设计
+### 3.1分层架构
+1. 中间件层(middleware)：包括数据库、缓存、消息队列等基础服务
+2. 数据基座层(data)：包括知识库服务
+3. 模型基座层(model)：AI模型服务
+4. 公共服务基座层(common)：通用服务
+5. 智能体(agent)：智能体服务
+6. 业务服务层(biz)：GHC业务服务
 
-### 3.1 目录结构
-
-```
-sk-agent/
-├── charts/                          # 3个业务层子Chart
-│   ├── infra/                       # 基础设施层
-│   │   ├── charts/
-│   │   │   ├── mysql/               # MySQL 8.0 (x86) / Kingbase (arm64)
-│   │   │   ├── redis/               # Redis 7.4 (多路径: data+conf)
-│   │   │   ├── rabbitmq/            # RabbitMQ 3.13
-│   │   │   └── minio/               # MinIO 对象存储
-│   │   ├── values.yaml
-│   │   └── Chart.yaml
-│   │
-│   ├── rag/                         # RAG层
-│   │   ├── charts/
-│   │   │   ├── memory/              # Memory服务 (依赖mysql)
-│   │   │   ├── milvus/              # Milvus 向量数据库 (依赖minio+etcd)
-│   │   │   └── rag-services/        # RAG服务 (依赖mysql+redis+milvus)
-│   │   ├── values.yaml
-│   │   └── Chart.yaml
-│   │
-│   └── platform/                    # 平台服务层 (Services + Web)
-│       ├── charts/
-│       │   ├── init-data/           # 数据初始化 (Job, 一次性)
-│       │   ├── user/                # 用户服务 (Java+ConfigMap, 依赖init-data)
-│       │   ├── domain/              # 领域服务 (Java+ConfigMap)
-│       │   ├── scheduler/           # 调度服务 (Java+ConfigMap)
-│       │   ├── agent/               # Agent服务 (Python)
-│       │   ├── agent-task/          # Agent任务 (Python, 依赖scheduler)
-│       │   ├── operation/           # 运营服务 (Java+ConfigMap)
-│       │   ├── storage/             # 存储服务 (Java+ConfigMap)
-│       │   ├── etl/                 # ETL服务 (Python)
-│       │   ├── etl-listener/        # ETL监听 (Python, 与etl镜像同)
-│       │   ├── etl-beat/            # ETL调度 (Python, 依赖user/domain/operation)
-│       │   ├── assessment/          # 评估服务 (Java+ConfigMap)
-│       │   ├── hospital/            # 医院服务 (Java+ConfigMap)
-│       │   ├── tcm/                 # 中医服务 (Java+ConfigMap)
-│       │   ├── notification/        # 通知服务 (Java+ConfigMap)
-│       │   ├── customer/            # 客户服务 (Java+ConfigMap)
-│       │   ├── dashboard/           # 仪表盘服务 (Java+ConfigMap, 依赖operation)
-│       │   ├── manager/             # 管理服务 (Java+ConfigMap, 依赖多服务)
-│       │   ├── app-web/             # App前端 (Node, 依赖domain)
-│       │   ├── hospital-web/        # 医院前端 (Node, 依赖hospital)
-│       │   └── nginx/               # Nginx网关 (+Ingress, 依赖app-web+hospital-web)
-│       ├── values.yaml
-│       └── Chart.yaml
-│
-├── templates/                       # 公共模板
-│   ├── _helpers.tpl                # 全局辅助函数
-│   └── common/                     # 公共模板
-│       ├── java-deployment.tpl    # Java服务模板 (+ConfigMap挂载)
-│       ├── java-configmap.tpl     # ConfigMap生成模板
-│       ├── python-deployment.tpl  # Python服务模板
+### 3.2 技术方案
+#### 3.2.1 helm结构
+```text
+sk-agent/                        # L1: 产品架构编排，支持整体部署  
+├── templates/
+│   ├── _helpers.tpl
+│   ├── NOTES.txt
+│   └── common/   # 公共模板
+│       ├── configmap.tpl          # ConfigMap生成模板                  
+│       ├── deployment.tpl         # 后端服务模板
 │       ├── node-deployment.tpl    # Node.js服务模板
-│       ├── statefulset.tpl         # StatefulSet模板 (多路径)
-│       ├── job.tpl                 # Job模板
-│       └── ingress.tpl             # Ingress模板
-│
+│       ├── statefulset.tpl        # StatefulSet模板 (多路径)
+│       ├── job.tpl                # Job模板
+│       └── global.yaml            # 全局配置
+├── charts/   
+│   ├── middleware            # L2: 定义中间建层服务编排，支持按层部署。尽量使用开源配置
+│       ├── Chart.yaml    
+│       ├── values.yaml
+│       └── charts
+│           ├── mysql/        # L3：定义服务逻辑，支持按服务部署
+│               ├── Chart.yaml    
+│               └── values.yaml
+│           ├── redis/
+│           ├── rabbitmq/
+│           ├── minio/
+│           └── milvus/
+│   ├── data-foundation/charts    # 定义数据基座层逻辑
+│           ├── domain?
+│           ├── memory-server
+│           └── rag-server
+│   ├── model-foundation/charts  # 定义模型基座层逻辑
+│           ├── asr
+│           ├── vllm-bge
+│           ├── vllm-reranker
+│           ├── vllm-30b
+│           ├── vllm-30b-lora
+│           └── vllm-vl-32b
+│   ├── common-foundation/charts  # 定义公共服务层逻辑
+│           ├── user         # 用户管理
+│           ├── etl          # 信息提取
+│           ├── storage      # 存储服务
+│           ├── notification # 消息通知 
+│           ├── operation    # 运营平台 
+│           ├── edge-mgmt    # 边端管理
+│           └──  asr-api     # 语音服务
+│   ├── medical-brain/charts  # 定义智能体层逻辑
+│           ├── agent
+│           ├── agent-task
+│           └── scheduler
+│   └── biz-foundation/charts # 定义业务层逻辑
+│           ├── healthcare    # 健康管理（包含前后端）
+│           ├── assement      # 健康评估
+│           ├── dashborad     # 数据统计
+│           ├── hospital      # 医院服务（包含前后端）
+│           └── tcm           # 中医服务
+│   └── gateway/charts # 定义网关逻辑
+│           ├── manager       # 网关管理
+│           └── nginx         # 代理服务
+├── Chart.yaml   
 ├── values.yaml                      # 默认配置
 ├── values-dev.yaml                  # 开发环境
 ├── values-pre.yaml                  # 预生产环境
-└── values-prod.yaml                 # 生产环境
+├── values-prod.yaml                 # 生产环境
+└── README.md
+```
+#### 3.2.2 配置说明
+-  L1级配置
+```yaml
+# Chart.yaml：定义产品部署架构
+apiVersion: v2
+name: sk-agent
+description: SK Agent Microservices Architecture - Parent Chart
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+keywords:
+  - microservices
+  - sk-agent
+  - kubernetes
+  - k3s
+
+maintainers:
+  - name: SK Agent Team
+    email: team@example.com
+
+dependencies:
+  - name: middleware
+    version: "0.1.0"
+  - name: data-service
+    version: "0.1.0"
+  - name: model-service
+    version: "0.1.0"
+  - name: common-service
+    version: "0.1.0" 
+  - name: biz-service
+    version: "0.1.0" 
+  - name: medical-brain
+    version: "0.1.0" 
+  - name: gateway
+    version: "0.1.0"  
+```
+- value.yaml：定义全局配置。部署环境、系统架构、命令空间、存储类等信息
+```yaml
+# Global settings
+global:
+  environment: dev
+  architecture: amd64
+  imagePullSecrets:
+    - name: registry-secret
+  storageClass: "manual-sc"
+  serviceAccount:
+    create: true
+    name: "sk-agent-account"
+  domain: "cluster.local"
 ```
 
-### 3.2 服务依赖关系
+- L2级配置
+```yaml
+# Chart.yaml： 定义层级服务及启动顺序
+apiVersion: v2
+name: sk-agent-service
+description: SK Agent Microservices Architecture - Parent Chart
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
 
+dependencies:
+  - name: svc-user
+    version: "0.1.0"
+    condition: svc-user.enabled
+  - name: svc-domain
+    version: "0.1.0"
+    condition: svc-domain.enabled
+
+keywords:
+  - microservices
+  - sk-agent
+  - kubernetes
+  - k3s
+home: https://github.com/your-org/sk-agent
+sources:
+  - https://github.com/your-org/sk-agent
+maintainers:
+  - name: SK Agent Team
+    email: team@example.com
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      INFRA LAYER                                 │
-│  ┌─────────┐  ┌─────────┐  ┌──────────┐  ┌────────┐           │
-│  │  MySQL  │  │  Redis  │  │ RabbitMQ │  │ MinIO  │           │
-│  │(x86/arm)│  │(多路径)  │  │         │  │        │           │
-│  └────┬────┘  └────┬────┘  └────┬─────┘  └───┬────┘           │
-└───────┼────────────┼────────────┼─────────────┼───────────────┘
-        │            │            │             │
-        ▼            ▼            ▼             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       RAG LAYER                                  │
-│  ┌─────────┐      ┌─────────┐      ┌─────────────┐            │
-│  │ Memory  │──────│ Milvus  │──────│ rag-services│            │
-│  │ (mysql) │      │(minio)  │      │(mysql+redis)│            │
-│  └─────────┘      └─────────┘      └─────────────┘            │
-└─────────────────────────────────────────────────────────────────┘
-        │
-        ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    PLATFORM SERVICES LAYER                       │
-│  ┌──────┐ ┌───────┐ ┌──────────┐ ┌───────┐ ┌──────────┐       │
-│  │ User │ │ Domain│ │ Scheduler│ │ Agent │ │Operation │       │
-│  │+CMAP │ │+CMAP  │ │  +CMAP   │ │       │ │  +CMAP   │       │
-│  └──────┘ └───────┘ └──────────┘ └───────┘ └──────────┘       │
-│  ┌───────┐ ┌──────┐ ┌─────────┐ ┌──────────┐ ┌──────────┐     │
-│  │Storage│ │  ETL │ │Hospital │ │ Manager  │ │  Tcm     │     │
-│  │+CMAP  │ │      │ │  +CMAP  │ │  +CMAP    │ │  +CMAP   │     │
-│  └───────┘ └──────┘ └─────────┘ └──────────┘ └──────────┘     │
-└─────────────────────────────────────────────────────────────────┘
-                                 │
-                                 ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      PLATFORM WEB LAYER                          │
-│  ┌──────────┐    ┌─────────────┐    ┌────────┐                │
-│  │ app-web  │    │hospital-web │    │  Nginx│                │
-│  │          │    │             │    │+Ingress│                │
-│  └──────────┘    └─────────────┘    └────────┘                │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 四、核心特性配置
-
-### 4.1 三层子Chart结构
-
-```
-父Chart sk-agent/
-    │
-    ├── charts/infra/         # 基础设施层 (4个服务)
-    │   ├── charts/mysql/     # 根据架构切换MySQL/Kingbase
-    │   ├── charts/redis/
-    │   ├── charts/rabbitmq/
-    │   └── charts/minio/
-    │
-    ├── charts/rag/          # RAG层 (3个服务)
-    │   ├── charts/memory/
-    │   ├── charts/milvus/
-    │   └── charts/rag-services/
-    │
-    └── charts/platform/     # 平台服务层 (21个服务)
-        ├── charts/init-data/ # Job类型
-        ├── charts/user/     # Java+ConfigMap
-        ├── charts/domain/   # Java+ConfigMap
-        ├── ... (其他Java服务)
-        ├── charts/agent/   # Python
-        ├── charts/etl/     # Python
-        ├── charts/app-web/ # Node
-        └── charts/nginx/   # Node+Ingress
+- value.yaml
+```yaml
+# ==============================================================================
+# Platform Services Layer - 子Chart配置 (svc-*)
+# ==============================================================================
 ```
 
 ### 4.2 多路径持久化存储
@@ -197,30 +200,13 @@ volumes:
     accessMode: ReadWriteOnce               # 访问模式
 ```
 
-**Infra服务配置**：
-
-| 服务 | volume数量 | 路径 | 存储大小 |
-|------|-----------|------|----------|
-| mysql/kingbase | 2 | /var/lib/mysql, /etc/mysql/conf.d | 10Gi + 1Gi |
-| redis | 2 | /data, /usr/local/etc/redis | 2Gi + 100Mi |
-| rabbitmq | 1 | /var/lib/rabbitmq | 8Gi |
-| minio | 1 | /data | 20Gi |
-
-**RAG服务配置**：
-
-| 服务 | volume数量 | 路径 | 存储大小 |
-|------|-----------|------|----------|
-| memory | 1 | /data | 5Gi |
-| milvus | 1 | /var/lib/milvus | 10Gi |
-| rag-services | 0 | - | - |
-
 ### 4.3 ConfigMap配置管理
 
-**实现原理**：Java服务模板自动调用ConfigMap模板生成application.yaml，并挂载到容器/config目录
+**实现原理**：服务模板自动调用ConfigMap模板生成application.yaml，并挂载到容器/config目录
 
 **模板文件**：`templates/common/java-configmap.tpl`
 ```yaml
-{{- define "java.configmap" -}}
+{{- define "service.configmap" -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -259,32 +245,32 @@ config:
 
 ### 4.4 多架构支持 (x86/arm64)
 
-**实现原理**：根据全局架构配置动态切换数据库类型
+**实现原理**：根据全局配置动态切换数据库类型
 
 **配置示例**：
 ```yaml
 # values.yaml
 global:
   architecture: amd64  # amd64 (x86) 或 arm64
-
 # MySQL子Chart values.yaml
 database:
-  type: mysql          # 根据架构自动切换
+  type: mysql 
   
 # 模板中判断
-{{- if eq .Values.global.architecture "arm64" }}
-image: kingbase-image
-{{- else }}
-image: mysql-image
+{{- if eq .Values.global.database "mysql" }}
+mysql.enabeled: true
+{{- elif eq .Values.global.database "postgres" }}
+postgres.enabeled: true
+{{- elif eq .Values.global.database "kingbase" }}
+kingbase.enabeled: true
 {{- end }}
 ```
 
 **架构差异**：
 
-| 配置项 | x86_64 (amd64) | arm64 |
-|-------|---------------|-------|
-| 数据库 | MySQL 8.0 | Kingbase |
-| 镜像 | mysql:8.0 | kingbase:v8r6 |
+| 数据库 | MySQL 8.0 | Kingbase | postgres |
+|-------|---------------|-------|-------|
+| 镜像 | mysql:8.0 | kingbase:v8r6 | postgres:15-alpine
 | JDBC驱动 | com.mysql.cj.jdbc.Driver | com.kingbase8.Driver |
 | 数据源URL | jdbc:mysql:// | jdbc:kingbase8:// |
 
@@ -339,20 +325,15 @@ templates/common/
 
 ### 5.2 子Chart模板调用示例
 
-**Java服务（ConfigMap）**：
+**后端服务（ConfigMap）**：
 ```yaml
-{{ include "java.configmap" (dict "root" . "serviceName" .Values.name "applicationYaml" .Values.config) }}
-{{ include "java.deployment" (dict "root" . "serviceName" .Values.name "image" .Values.image "port" .Values.service.port "resources" .Values.resources "configMap" true "javaOpts" .Values.javaOpts) }}
+{{ include "service.configmap" (dict "root" . "serviceName" .Values.name "applicationYaml" .Values.config) }}
+{{ include "service.deployment" (dict "root" . "serviceName" .Values.name "image" .Values.image "port" .Values.service.port "resources" .Values.resources "configMap" true "javaOpts" .Values.javaOpts) }}
 ```
 
 **有状态服务（多路径）**：
 ```yaml
 {{ include "statefulset" (dict "root" . "name" .Values.name "image" .Values.image "port" .Values.service.port "volumes" .Values.volumes "env" .Values.env "resources" .Values.resources) }}
-```
-
-**Python服务**：
-```yaml
-{{ include "python.deployment" (dict "root" . "serviceName" .Values.name "image" .Values.image "port" .Values.service.port "resources" .Values.resources "command" .Values.command) }}
 ```
 
 ---
@@ -370,23 +351,18 @@ version: 0.1.0
 appVersion: "1.0.0"
 
 dependencies:
-  # Infrastructure Layer (4个服务)
-  - name: infra
+  # 中间件Layer (4个服务)
+  - name: middleware
     version: "0.1.0"
     condition: infra.enabled
     repository: "file://charts/infra"
 
-  # RAG Layer (3个服务)
-  - name: rag
+  # 数据基座 Layer (3个服务)
+  - name: data-foundation
     version: "0.1.0"
     condition: rag.enabled
     repository: "file://charts/rag"
-
-  # Platform Layer (21个服务)
-  - name: platform
-    version: "0.1.0"
-    condition: platform.enabled
-    repository: "file://charts/platform"
+...
 ```
 
 ### 6.2 父Chart values.yaml（全局配置）
@@ -402,10 +378,10 @@ global:
     create: true
     name: "sk-agent-account"
 
-# Infrastructure Layer
-infra:
+# Middleware Layer
+middleware:
   enabled: true
-  mysql:
+  database:
     enabled: true
     volumes:
       - name: data
@@ -420,14 +396,7 @@ infra:
     enabled: true
   minio:
     enabled: true
-
-# RAG Layer
-rag:
-  enabled: true
-
-# Platform Layer
-platform:
-  enabled: true
+...
 ```
 
 ### 6.3 Infra子Chart Chart.yaml
@@ -435,15 +404,15 @@ platform:
 ```yaml
 apiVersion: v2
 name: infra
-description: Infrastructure Layer - MySQL, Redis, RabbitMQ, MinIO
+description: Infrastructure Layer - Database, Redis, RabbitMQ, MinIO
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
 
 dependencies:
-  - name: mysql
+  - name: database
     version: "0.1.0"
-    condition: mysql.enabled
+    condition: database.enabled
   - name: redis
     version: "0.1.0"
     condition: redis.enabled
@@ -524,7 +493,7 @@ dependencies:
 
 | 服务类型 | K8s 资源 | 特性 |
 |---------|----------|------|
-| MySQL/Kingbase | StatefulSet | 有状态服务，支持多路径持久化，多架构 |
+| Database| StatefulSet | 有状态服务，支持多路径持久化，多类型（MySQL/Kingbase/Postgres ） |
 | Redis | StatefulSet | 有状态缓存，支持多路径持久化 |
 | RabbitMQ | StatefulSet | 有状态消息队列，支持多路径持久化 |
 | MinIO | StatefulSet | 有状态对象存储，支持多路径持久化 |
@@ -545,7 +514,7 @@ dependencies:
 | 配置项 | dev | pre | prod |
 |-------|-----|-----|------|
 | StorageClass | manual-sc | standard | standard |
-| MySQL存储 | 5Gi | 20Gi | 100Gi |
+| 数据库存储 | 5Gi | 20Gi | 100Gi |
 | Redis存储 | 1Gi | 5Gi | 20Gi |
 | 服务副本数 | 1 | 2 | 2-3 |
 | 资源配置 | 最低 | 中等 | 高 |
@@ -592,7 +561,7 @@ data:
 
 ```yaml
 registry:
-  server: "registry.example.com"
+  server: "saascr.shukun.net"
   username: ""
   password: ""
   email: ""
