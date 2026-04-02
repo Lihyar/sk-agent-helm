@@ -14,7 +14,7 @@ volumes:
   - name: data
     mountPath: /var/lib/rabbitmq
     size: 8Gi
-    storageClass: manual-sc
+    storageClass: local-path
 resources:
   requests:
     cpu: 250m

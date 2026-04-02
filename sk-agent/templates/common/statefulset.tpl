@@ -19,7 +19,7 @@ Example volumes:
 {{- $imagePullPolicy := .imagePullPolicy | default "IfNotPresent" -}}
 {{- $port := .port | default 8080 -}}
 {{- $resources := .resources | default (dict "requests" (dict "cpu" "250m" "memory" "512Mi") "limits" (dict "cpu" "1000m" "memory" "2Gi")) -}}
-{{- $volumes := .volumes | default (list (dict "name" "data" "mountPath" "/data" "size" "2Gi" "storageClass" "manual-sc")) -}}
+{{- $volumes := .volumes | default (list (dict "name" "data" "mountPath" "/data" "size" "2Gi" "storageClass" "local-path")) -}}
 {{- $serviceType := .serviceType | default "ClusterIP" -}}
 {{- $nodePort := .nodePort | default 0 -}}
 {{- $headless := .headless | default false -}}
@@ -147,7 +147,7 @@ spec:
       spec:
         accessModes:
           - {{ .accessMode | default "ReadWriteOnce" }}
-        storageClassName: {{ .storageClass | default "manual-sc" }}
+        storageClassName: {{ .storageClass | default "local-path" }}
         resources:
           requests:
             storage: {{ .size }}

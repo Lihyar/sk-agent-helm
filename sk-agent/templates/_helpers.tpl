@@ -70,7 +70,7 @@ Get the architecture
 Get the storage class
 */}}
 {{- define "sk-agent.storageClass" -}}
-{{- .Values.global.storageClass | default "manual-sc" }}
+{{- .Values.global.storageClass | default "local-path" }}
 {{- end }}
 
 {{/*

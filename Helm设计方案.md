@@ -142,7 +142,7 @@ global:
   architecture: amd64
   imagePullSecrets:
     - name: registry-secret
-  storageClass: "manual-sc"
+  storageClass: "local-path"
   serviceAccount:
     create: true
     name: "sk-agent-account"
@@ -196,7 +196,7 @@ volumes:
   - name: data                              # volume名称
     mountPath: /var/lib/mysql              # 容器内挂载路径
     size: 10Gi                              # 存储大小
-    storageClass: manual-sc                # 存储类
+    storageClass: local-path                # 存储类
     accessMode: ReadWriteOnce               # 访问模式
 ```
 
@@ -373,7 +373,7 @@ global:
   architecture: amd64           # amd64 (x86) 或 arm64
   imagePullSecrets:
     - name: registry-secret
-  storageClass: "manual-sc"
+  storageClass: "local-path"
   serviceAccount:
     create: true
     name: "sk-agent-account"
@@ -513,7 +513,7 @@ dependencies:
 
 | 配置项 | dev | pre | prod |
 |-------|-----|-----|------|
-| StorageClass | manual-sc | standard | standard |
+| StorageClass | local-path | standard | standard |
 | 数据库存储 | 5Gi | 20Gi | 100Gi |
 | Redis存储 | 1Gi | 5Gi | 20Gi |
 | 服务副本数 | 1 | 2 | 2-3 |
@@ -578,7 +578,7 @@ registry:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: manual-sc
+  name: local-path
 provisioner: kubernetes.io/no-provisioner
 ```
 
@@ -588,7 +588,7 @@ provisioner: kubernetes.io/no-provisioner
 ```yaml
 persistence:
   hostPath: "/tmp/volumes"
-  storageClass: "manual-sc"
+  storageClass: "local-path"
 ```
 
 **values-prod.yaml**:

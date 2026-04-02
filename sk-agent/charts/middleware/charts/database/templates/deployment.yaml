@@ -10,7 +10,7 @@
 {{- else if $.Values.global.storageClass }}
 {{- $sc = $.Values.global.storageClass }}
 {{- else }}
-{{- $sc = "manual-sc" }}
+{{- $sc = "local-path" }}
 {{- end }}
 {{- $rawVolumes := list }}
 

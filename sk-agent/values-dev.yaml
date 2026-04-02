@@ -5,7 +5,7 @@ global:
   environment: dev
   architecture: amd64
   database: mysql
-  storageClass: "manual-sc"
+  storageClass: "local-path"
   imagePullSecrets:
     - name: registry-secret
   serviceAccount:

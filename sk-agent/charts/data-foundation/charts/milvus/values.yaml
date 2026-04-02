@@ -14,7 +14,7 @@ volumes:
   - name: data
     mountPath: /var/lib/milvus
     size: 10Gi
-    storageClass: manual-sc
+    storageClass: local-path
 resources:
   requests:
     cpu: 1000m

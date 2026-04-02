@@ -13,10 +13,6 @@ global:
 
 registry:
   enabled: false  # 禁用自动创建 Secret
-  server: "saascr.shukun.net"
-  username: ""
-  password: ""
-  email: ""
 
 middleware:
   enabled: true
@@ -25,7 +21,7 @@ middleware:
     serviceType: NodePort
     nodePort: 30306
   redis:
-    enabled: false
+    enabled: true
   rabbitmq:
     enabled: false
   minio:

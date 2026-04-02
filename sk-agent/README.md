@@ -183,7 +183,7 @@ helm install sk-agent-prod sk-agent \
 |------|------|--------|
 | `global.environment` | 环境 | `dev` |
 | `global.architecture` | 架构 | `amd64` |
-| `global.storageClass` | 存储类 | `manual-sc` |
+| `global.storageClass` | 存储类 | `local-path` |
 | `global.imagePullSecrets` | 镜像密钥 | `[]` |
 
 ### Middleware层配置
@@ -297,7 +297,7 @@ global:
 ```yaml
 global:
   hostPath: "/tmp/volumes/mysql-dev"
-  storageClass: "manual-sc"
+  storageClass: "local-path"
 ```
 
 ## 健康检查

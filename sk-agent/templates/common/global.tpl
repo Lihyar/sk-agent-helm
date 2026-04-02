@@ -25,11 +25,11 @@ data:
   .dockerconfigjson: {{ printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\"}}}" .Values.registry.server .Values.registry.username .Values.registry.password .Values.registry.email | b64enc | quote }}
 {{- end }}
 ---
-{{- if eq .Values.global.storageClass "manual-sc" }}
+{{- if eq .Values.global.storageClass "local-path" }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: manual-sc
+  name: local-path
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
 {{- end }}

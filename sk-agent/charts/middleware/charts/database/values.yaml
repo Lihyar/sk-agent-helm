@@ -71,12 +71,12 @@ postgresql:
     - name: data
       mountPath: /var/lib/postgresql/data
       size: 10Gi
-      storageClass: manual-sc
+      storageClass: local-path
       initCommand: "mkdir -p /var/lib/postgresql/data && chown -R 70:70 /var/lib/postgresql/data"
     - name: conf
       mountPath: /etc/postgresql/conf.d
       size: 1Gi
-      storageClass: manual-sc
+      storageClass: local-path
       readOnly: true
   resources:
     requests:
@@ -106,12 +106,12 @@ kingbase:
     - name: data
       mountPath: /opt/kingbase/data
       size: 10Gi
-      storageClass: manual-sc
+      storageClass: local-path
       initCommand: "mkdir -p /opt/kingbase/data && chown -R 1000:1000 /opt/kingbase/data"
     - name: conf
       mountPath: /opt/kingbase/conf
       size: 1Gi
-      storageClass: manual-sc
+      storageClass: local-path
       readOnly: true
   resources:
     requests:

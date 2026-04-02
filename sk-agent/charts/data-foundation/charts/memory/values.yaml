@@ -9,7 +9,7 @@ volumes:
   - name: data
     mountPath: /data
     size: 5Gi
-    storageClass: manual-sc
+    storageClass: local-path
 resources:
   requests:
     cpu: 500m

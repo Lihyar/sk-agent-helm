@@ -14,7 +14,7 @@ volumes:
   - name: data
     mountPath: /data
     size: 20Gi
-    storageClass: manual-sc
+    storageClass: local-path
 resources:
   requests:
     cpu: 250m

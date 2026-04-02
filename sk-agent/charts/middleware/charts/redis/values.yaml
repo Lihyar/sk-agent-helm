@@ -1,10 +1,18 @@
 name: redis
+
+# storageClass (falls back to global.storageClass if empty)
+storageClass: ""
+
 image:
-  repository: redis
-  tag: 7.2-alpine
+  repository: saascr.shukun.net/ghc/backend/sk-redis
+  tag: 4.0.2
   pullPolicy: IfNotPresent
+
 service:
+  serviceType: NodePort
   port: 6379
+  nodePort: 30379
+
 env:
   - name: REDIS_PASSWORD
     value: "redis123"
@@ -12,11 +20,11 @@ volumes:
   - name: data
     mountPath: /data
     size: 2Gi
-    storageClass: manual-sc
+    storageClass: local-path
   - name: conf
     mountPath: /usr/local/etc/redis
     size: 100Mi
-    storageClass: manual-sc
+    storageClass: local-path
 resources:
   requests:
     cpu: 100m
