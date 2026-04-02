@@ -9,34 +9,39 @@ enabled: true
 database:
   type: mysql
 
+# Service exposure for external access
+serviceType: NodePort
+nodePort: 30306
+
+# StorageClass (falls back to global.storageClass if empty)
+storageClass: ""
+
 # MySQL Configuration
 mysql:
   enabled: true
   image:
-    repository: mysql
-    tag: "8.0"
+    repository: saascr.shukun.net/ghc/backend/sk-mysql
+    tag: 5.7.36-1debian10
     pullPolicy: IfNotPresent
   service:
     port: 3306
   env:
     - name: MYSQL_ROOT_PASSWORD
-      value: "rootpass"
+      value: "Y1WBZ30vjsriiHiEgK2ZkE8osjYNsj"
     - name: MYSQL_DATABASE
-      value: "skagent"
+      value: "sk-agent"
     - name: MYSQL_USER
       value: "skuser"
     - name: MYSQL_PASSWORD
-      value: "skpass"
+      value: "sk_test@123"
   volumes:
     - name: data
       mountPath: /var/lib/mysql
       size: 10Gi
-      storageClass: manual-sc
       initCommand: "mkdir -p /var/lib/mysql && chown -R 999:999 /var/lib/mysql"
     - name: conf
       mountPath: /etc/mysql/conf.d
       size: 1Gi
-      storageClass: manual-sc
       readOnly: true
   resources:
     requests:

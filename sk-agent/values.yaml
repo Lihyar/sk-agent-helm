@@ -1,182 +1,44 @@
-# ==============================================================================
-# SK Agent Microservices Architecture - Parent Chart Configuration (V4)
-# 6-Layer Architecture: middleware, data-service, model-service, common-service, ghc-service, gateway
-# ==============================================================================
-
+# 仅安装mysql
 # Global settings
 global:
   environment: dev
   architecture: amd64
   imagePullSecrets:
     - name: registry-secret
-  storageClass: "manual-sc"
+  storageClass: "local-path"
   serviceAccount:
-    create: true
-    name: "sk-agent-account"
-  domain: "cluster.local"
+    create: false
+    name: "default"
   database: mysql
 
-# Private Registry
 registry:
-  enabled: true
+  enabled: false  # 禁用自动创建 Secret
   server: "saascr.shukun.net"
   username: ""
   password: ""
   email: ""
 
-# ==============================================================================
-# L2: Middleware Layer (中间件层)
-# ==============================================================================
 middleware:
   enabled: true
-  mysql:
+  database:
     enabled: true
-    fullnameOverride: mysql
-    auth:
-      rootPassword: "rootpass"
-      database: "skagent"
-    primary:
-      service:
-        type: LoadBalancer
-        port: 3306
-      persistence:
-        enabled: true
-        size: 10Gi
-        storageClass: "manual-sc"
-      resources:
-        requests:
-          cpu: 500m
-          memory: 1Gi
-        limits:
-          cpu: 2000m
-          memory: 4Gi
+    serviceType: NodePort
+    nodePort: 30306
   redis:
-    enabled: true
+    enabled: false
   rabbitmq:
-    enabled: true
+    enabled: false
   minio:
-    enabled: true
-
-# ==============================================================================
-# L2: Data Service Layer (数据基座层)
-# ==============================================================================
-data-service:
-  enabled: true
-  memory:
-    enabled: true
-  milvus:
-    enabled: true
-  rag-services:
-    enabled: true
-
-# ==============================================================================
-# L2: Model Service Layer (模型基座层)
-# ==============================================================================
-model-service:
+    enabled: false
+data-foundation:
   enabled: false
-  asr:
-    enabled: false
-  vllm-bge:
-    enabled: false
-  vllm-reranker:
-    enabled: false
-  vllm-30b:
-    enabled: false
-  vllm-30b-lora:
-    enabled: false
-  vllm-vl-32b:
-    enabled: false
-
-# ==============================================================================
-# L2: Common Service Layer (公共服务基座层)
-# ==============================================================================
-common-service:
-  enabled: true
-  user:
-    enabled: true
-  domain:
-    enabled: true
-  etl:
-    enabled: true
-  storage:
-    enabled: true
-  notification:
-    enabled: true
-  operation:
-    enabled: true
-
-# ==============================================================================
-# L2: Medical Brain Layer (智能体层)
-# ==============================================================================
+model-foundation:
+  enabled: false
+common-foundation:
+  enabled: false
 medical-brain:
-  enabled: true
-  agent:
-    enabled: true
-  agent-task:
-    enabled: true
-  scheduler:
-    enabled: true
-
-# ==============================================================================
-# L2: Business Service Layer (业务服务层)
-# ==============================================================================
-biz-service:
-  enabled: true
-  assessment:
-    enabled: true
-  dashboard:
-    enabled: true
-  hospital:
-    enabled: true
-  tcm:
-    enabled: true
-  customer:
-    enabled: true
-
-# ==============================================================================
-# L2: Gateway Layer (网关层)
-# ==============================================================================
-gateway:
-  enabled: true
-  manager:
-    enabled: true
-  nginx:
-    enabled: true
-  app-web:
-    enabled: true
-  hospital-web:
-    enabled: true
-
-# ==============================================================================
-# Global Settings
-# ==============================================================================
-nodeSelector:
-  kubernetes.io/arch: "amd64"
-
-tolerations: []
-
-affinity: {}
-
-securityContext:
-  runAsUser: 1000
-  runAsGroup: 1000
-  fsGroup: 1000
-
-podAnnotations: {}
-
-podLabels: {}
-
-ingress:
   enabled: false
-  className: "nginx"
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-    - host: sk-agent.local
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: sk-agent-tls
-      hosts:
-        - sk-agent.local
+biz-foundation:
+  enabled: false
+gateway:
+  enabled: false

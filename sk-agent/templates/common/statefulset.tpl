@@ -21,6 +21,7 @@ Example volumes:
 {{- $resources := .resources | default (dict "requests" (dict "cpu" "250m" "memory" "512Mi") "limits" (dict "cpu" "1000m" "memory" "2Gi")) -}}
 {{- $volumes := .volumes | default (list (dict "name" "data" "mountPath" "/data" "size" "2Gi" "storageClass" "manual-sc")) -}}
 {{- $serviceType := .serviceType | default "ClusterIP" -}}
+{{- $nodePort := .nodePort | default 0 -}}
 {{- $headless := .headless | default false -}}
 {{- $env := .env | default list -}}
 {{- $command := .command -}}
@@ -177,11 +178,21 @@ metadata:
     {{- include "sk-agent.labels" $root | nindent 4 }}
 spec:
   type: {{ $serviceType }}
+  {{- if and (eq $serviceType "NodePort") $nodePort }}
+  externalTrafficPolicy: Local
+  ports:
+    - port: {{ $port }}
+      targetPort: http
+      nodePort: {{ $nodePort }}
+      protocol: TCP
+      name: http
+  {{- else }}
   ports:
     - port: {{ $port }}
       targetPort: http
       protocol: TCP
       name: http
+  {{- end }}
   selector:
     app: {{ $name }}
 {{- end }}

@@ -20,5 +20,5 @@ dependencies:
 - name: gateway
   repository: ""
   version: 0.1.0
-digest: sha256:353d576419a853a0e1991eb823f3af7be75dda50f7ddf4b1d9c4345daa7de722
-generated: "2026-03-31T11:26:09.859447+08:00"
+digest: sha256:a4440710039f09a78664ed29019f0360bb6e88c71660655e77539885c15b7fa1
+generated: "2026-04-01T16:14:59.70466+08:00"

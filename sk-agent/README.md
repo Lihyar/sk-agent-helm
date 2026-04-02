@@ -27,7 +27,7 @@ sk-agent/                          # 父Chart (L1)
     │       ├── milvus/           # Milvus向量数据库
     │       └── rag-services/      # RAG服务
     │
-    ├── model-foundation/          # L2: 模型基座层
+    ├── model-foundation/          # L2: 模型基座层(暂不实现)
     │   └── charts/
     │       ├── asr/              # ASR语音识别服务
     │       ├── vllm-30b/         # VLLM 30B模型

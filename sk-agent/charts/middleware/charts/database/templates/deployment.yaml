@@ -3,29 +3,43 @@
 {{- $imageConfig := dict }}
 {{- $port := 0 }}
 {{- $envList := list }}
-{{- $volumes := list }}
 {{- $resources := dict }}
+{{- $sc := "" }}
+{{- if .Values.storageClass }}
+{{- $sc = .Values.storageClass }}
+{{- else if $.Values.global.storageClass }}
+{{- $sc = $.Values.global.storageClass }}
+{{- else }}
+{{- $sc = "manual-sc" }}
+{{- end }}
+{{- $rawVolumes := list }}
 
 {{- if eq $dbType "mysql" }}
 {{- $imageConfig = .Values.mysql.image }}
 {{- $port = .Values.mysql.service.port }}
 {{- $envList = .Values.mysql.env }}
-{{- $volumes = .Values.mysql.volumes }}
 {{- $resources = .Values.mysql.resources }}
+{{- $rawVolumes = .Values.mysql.volumes }}
 {{- else if eq $dbType "postgresql" }}
 {{- $imageConfig = .Values.postgresql.image }}
 {{- $port = .Values.postgresql.service.port }}
 {{- $envList = .Values.postgresql.env }}
-{{- $volumes = .Values.postgresql.volumes }}
 {{- $resources = .Values.postgresql.resources }}
+{{- $rawVolumes = .Values.postgresql.volumes }}
 {{- else if eq $dbType "kingbase" }}
 {{- $imageConfig = .Values.kingbase.image }}
 {{- $port = .Values.kingbase.service.port }}
 {{- $envList = .Values.kingbase.env }}
-{{- $volumes = .Values.kingbase.volumes }}
 {{- $resources = .Values.kingbase.resources }}
+{{- $rawVolumes = .Values.kingbase.volumes }}
 {{- else }}
 {{- fail "Unsupported database type. Must be one of: mysql, postgresql, kingbase" }}
+{{- end }}
+
+{{- $volumes := list }}
+{{- range $rawVolumes }}
+{{- $vol := merge . (dict "storageClass" $sc) }}
+{{- $volumes = append $volumes $vol }}
 {{- end }}
 
 {{ include "statefulset" (dict 
@@ -36,5 +50,7 @@
   "volumes" $volumes
   "env" $envList
   "resources" $resources
+  "serviceType" .Values.serviceType
+  "nodePort" .Values.nodePort
 ) }}
 {{- end }}

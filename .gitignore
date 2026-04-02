@@ -2,6 +2,8 @@
 .vscode
 .idea
 volumes
+*/debug.txt
+*/*-only*
 # sk-agent/charts/medical-brain
 # sk-agent/charts/gateway
 # sk-agent/charts/*-foundation

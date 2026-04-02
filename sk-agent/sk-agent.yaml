@@ -789,10 +789,12 @@ metadata:
     app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
 spec:
-  type: ClusterIP
+  type: NodePort
+  externalTrafficPolicy: Local
   ports:
     - port: 3306
       targetPort: http
+      nodePort: 30306
       protocol: TCP
       name: http
   selector:
@@ -2561,7 +2563,7 @@ spec:
         null
       containers:
         - name: mysql
-          image: "mysql:8.0"
+          image: "saascr.shukun.net/ghc/backend/sk-mysql:5.7.36-1debian10"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -2578,16 +2580,16 @@ spec:
                   fieldPath: metadata.namespace
             - 
               name: MYSQL_ROOT_PASSWORD
-              value: rootpass
+              value: Y1WBZ30vjsriiHiEgK2ZkE8osjYNsj
             - 
               name: MYSQL_DATABASE
-              value: skagent
+              value: sk-agent
             - 
               name: MYSQL_USER
               value: skuser
             - 
               name: MYSQL_PASSWORD
-              value: skpass
+              value: sk_test@123
           livenessProbe:
             tcpSocket:
               port: http

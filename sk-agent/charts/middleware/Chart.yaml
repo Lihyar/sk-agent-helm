@@ -6,6 +6,9 @@ version: 0.1.0
 appVersion: "1.0.0"
 
 dependencies:
+  - name: database
+    version: "0.1.0"
+    condition: database.enabled
   - name: redis
     version: "0.1.0"
     condition: redis.enabled
@@ -15,9 +18,6 @@ dependencies:
   - name: minio
     version: "0.1.0"
     condition: minio.enabled
-  - name: database
-    version: "0.1.0"
-    condition: database.enabled
 
 keywords:
   - middleware
