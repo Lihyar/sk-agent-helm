@@ -1,10 +1,14 @@
 name: rabbitmq
 image:
-  repository: rabbitmq
-  tag: 3.13-management
+  repository: saascr.shukun.net/ghc/backend/sk-rabbitmq
+  tag: 3.7.14
   pullPolicy: IfNotPresent
+
 service:
-  port: 5672
+  serviceType: NodePort
+  port: 15672
+  nodePort: 30300
+
 env:
   - name: RABBITMQ_DEFAULT_USER
     value: admin

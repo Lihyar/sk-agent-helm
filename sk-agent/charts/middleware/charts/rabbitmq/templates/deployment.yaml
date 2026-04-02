@@ -1,9 +1,26 @@
+{{- $sc := "" }}
+{{- if .Values.storageClass }}
+{{- $sc = .Values.storageClass }}
+{{- else if $.Values.global.storageClass }}
+{{- $sc = $.Values.global.storageClass }}
+{{- else }}
+{{- $sc = "local-path" }}
+{{- end }}
+
+{{- $volumes := list }}
+{{- range .Values.volumes }}
+{{- $vol := merge . (dict "storageClass" $sc) }}
+{{- $volumes = append $volumes $vol }}
+{{- end }}
+
 {{ include "statefulset" (dict 
   "root" . 
   "name" .Values.name
   "image" .Values.image 
   "port" .Values.service.port 
-  "volumes" .Values.volumes
+  "volumes" $volumes
   "env" .Values.env
   "resources" .Values.resources
+  "serviceType" .Values.service.serviceType
+  "nodePort" .Values.service.nodePort
 ) }}

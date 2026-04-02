@@ -16,16 +16,6 @@ registry:
 
 middleware:
   enabled: true
-  database:
-    enabled: true
-    serviceType: NodePort
-    nodePort: 30306
-  redis:
-    enabled: true
-  rabbitmq:
-    enabled: false
-  minio:
-    enabled: false
 data-foundation:
   enabled: false
 model-foundation:
