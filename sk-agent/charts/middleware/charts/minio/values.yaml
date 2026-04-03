@@ -1,24 +1,72 @@
-name: minio
-image:
-  repository: minio/minio
-  tag: latest
-  pullPolicy: IfNotPresent
-service:
-  port: 9000
-env:
-  - name: MINIO_ROOT_USER
-    value: minioadmin
-  - name: MINIO_ROOT_PASSWORD
-    value: minioadmin123
-volumes:
-  - name: data
-    mountPath: /data
+## MinIO 子 chart 配置
+minio:
+  image:
+    registry: saascr.shukun.net
+    repository: ghc/llm/minio/minio
+    tag: RELEASE.2023-03-20T20-16-18Z
+    pullPolicy: IfNotPresent
+
+  mode: standalone
+
+  auth:
+    rootUser: minioadmin
+    rootPassword: minioadmin@123
+
+  command: ["minio"]
+  args: ["server", "/data", "--console-address", ":9001"]
+
+  service:
+    type: NodePort
+    externalTrafficPolicy: Local
+    ports:
+      api: 9000
+      console: 9001
+    nodePorts:
+      api: 30390
+      console: 30901
+
+  console:
+    enabled: true
+    image:
+      registry: saascr.shukun.net
+      repository: ghc/llm/minio/minio
+      tag: RELEASE.2023-03-20T20-16-18Z
+    service:
+      type: NodePort
+      ports:
+        http: 9001
+      nodePorts:
+        http: 30901
+
+  persistence:
+    enabled: true
+    storageClass: ""
     size: 20Gi
-    storageClass: local-path
-resources:
-  requests:
-    cpu: 250m
-    memory: 512Mi
-  limits:
-    cpu: 1000m
-    memory: 2Gi
+    mountPath: /data
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+  networkPolicy:
+    enabled: false
+
+  podSecurityContext:
+    enabled: false
+
+  containerSecurityContext:
+    enabled: false

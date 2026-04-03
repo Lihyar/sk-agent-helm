@@ -1,9 +1,0 @@
-{{ include "statefulset" (dict 
-  "root" . 
-  "name" .Values.name
-  "image" .Values.image 
-  "port" .Values.service.port 
-  "volumes" .Values.volumes
-  "env" .Values.env
-  "resources" .Values.resources
-) }}
